@@ -12,7 +12,7 @@ sudo apt-get -y upgrade
 
 # Install apps
 # Note that rsyslog is REQUIRED for fail2ban to work properly (since Debian 12)
-sudo apt-get install -y micro tmux rsync cron htop rsyslog fail2ban
+sudo apt-get install -y micro tmux rsync cron htop rsyslog fail2ban git
 
 # Download .tmux.conf
 wget -P ~/ https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf
