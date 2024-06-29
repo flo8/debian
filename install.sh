@@ -17,6 +17,9 @@ sudo apt-get install -y micro tmux rsync cron htop rsyslog fail2ban
 # Download .tmux.conf
 wget -P ~/ https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf
 
+# Install TPM
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
 # Reload tmux config
 tmux source ~/.tmux.conf
 
