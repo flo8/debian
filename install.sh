@@ -10,3 +10,6 @@ apt-get upgrade
 
 apt-get install micro tmux rsync cron htop
 
+
+# Download .tmux.conf
+wget -P ~/ 
