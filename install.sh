@@ -12,4 +12,4 @@ apt-get install micro tmux rsync cron htop
 
 
 # Download .tmux.conf
-wget -P ~/ 
+wget -P ~/ https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf
