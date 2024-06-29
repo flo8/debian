@@ -30,14 +30,13 @@ sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 
 # Install Clickhouse
-#export DEBIAN_FRONTEND=noninteractive
-#sudo apt-get install -y apt-transport-https ca-certificates curl gnupg
-#curl -fsSL 'https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key' | sudo gpg --dearmor -o /usr/share/keyrings/clickhouse-keyring.gpg
-#echo "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] https://packages.clickhouse.com/deb stable main" | sudo tee \
-#    /etc/apt/sources.list.d/clickhouse.list
-#sudo apt-get update
-#sudo apt-get install -y clickhouse-server 
-#sudo service clickhouse-server start
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg
+curl -fsSL 'https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key' | sudo gpg --dearmor -o /usr/share/keyrings/clickhouse-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] https://packages.clickhouse.com/deb stable main" | sudo tee \
+    /etc/apt/sources.list.d/clickhouse.list
+sudo apt-get update
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y clickhouse-server clickhouse-client
+sudo service clickhouse-server start
 
 # Set the time
 sudo timedatectl set-ntp true
