@@ -17,6 +17,9 @@ sudo apt-get install -y micro tmux rsync cron htop rsyslog fail2ban
 # Download .tmux.conf
 wget -P ~/ https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf
 
+# Reload tmux config
+tmux source ~/.tmux.conf
+
 # Start services
 sudo systemctl enable cron
 sudo systemctl start cron
@@ -47,3 +50,5 @@ MaxAuthTries 3
 MaxSessions 5
 EOF
 
+# Everything installed
+echo "Press Prefix + [I] to install tpm in tmux"
