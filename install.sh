@@ -27,6 +27,7 @@ sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 
 # Install Clickhouse
+export DEBIAN_FRONTEND=noninteractive
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg
 curl -fsSL 'https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key' | sudo gpg --dearmor -o /usr/share/keyrings/clickhouse-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] https://packages.clickhouse.com/deb stable main" | sudo tee \
