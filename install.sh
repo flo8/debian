@@ -26,8 +26,6 @@ tmux source ~/.tmux.conf
 # Start services
 sudo systemctl enable cron
 sudo systemctl start cron
-sudo systemctl enable fail2ban
-sudo systemctl start fail2ban
 
 # Install Clickhouse
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg
@@ -74,7 +72,21 @@ PermitRootLogin prohibit-password
 StrictModes yes
 MaxAuthTries 3
 MaxSessions 5
+PubkeyAuthentication yes
+PermitEmptyPasswords no
 EOF
+
+# Check SSH is correct
+sudo sshd -t
+
+# Adds fail2ban configuration
+sudo wget -O /etc/fail2ban/jail.local https://raw.githubusercontent.com/flo8/debian/main/jail.local
+sudo systemctl start fail2ban
+sudo systemctl enable fail2ban
+
+# Display status of fail2ban
+sudo fail2ban-client status
+sudo fail2ban-client status sshd
 
 # Check clickhouse is running
 sudo systemctl status clickhouse-server
