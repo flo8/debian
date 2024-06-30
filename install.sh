@@ -88,6 +88,9 @@ sudo systemctl enable fail2ban
 sudo fail2ban-client status
 sudo fail2ban-client status sshd
 
+# Adds UFW and configure it
+wget -qO- https://raw.githubusercontent.com/flo8/debian/main/ufw.sh | bash
+
 # Check clickhouse is running
 sudo systemctl status clickhouse-server
 ps -ef | grep clickhouse
