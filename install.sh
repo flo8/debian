@@ -39,6 +39,16 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] http
 sudo apt update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y clickhouse-server clickhouse-client clickhouse-common-static
 
+# Update clickhouse server conf file
+sudo sed -i 's|<user_files_path>/var/lib/clickhouse/user_files/</user_files_path>|<user_files_path>/home/debian/apps</user_files_path>|g' /etc/clickhouse-server/config.xml
+
+# Restart Clickhouse server
+sudo service clickhouse-server restart
+
+# A bit of cosmetic changes
+echo "alias ls='ls --color=auto'" >> ~/.bashrc
+source ~/.bashrc
+
 # Set the time
 sudo timedatectl set-ntp true
 timedatectl status
