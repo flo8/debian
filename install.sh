@@ -12,7 +12,7 @@ sudo apt-get -y upgrade
 
 # Install apps
 # Note that rsyslog is REQUIRED for fail2ban to work properly (since Debian 12)
-sudo apt-get install -y micro tmux rsync cron htop rsyslog fail2ban git
+sudo apt-get install -y micro tmux rsync cron htop rsyslog fail2ban git lsof
 
 # Download .tmux.conf
 wget -P ~/ https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf
@@ -63,6 +63,10 @@ StrictModes yes
 MaxAuthTries 3
 MaxSessions 5
 EOF
+
+# Check clickhouse is running
+ps -ef | grep clickhouse
+sudo lsof -i:9000
 
 # Everything installed
 echo "Press Prefix + [I] to install tpm in tmux"
