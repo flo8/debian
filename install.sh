@@ -65,6 +65,7 @@ MaxSessions 5
 EOF
 
 # Check clickhouse is running
+sudo systemctl status clickhouse-server
 ps -ef | grep clickhouse
 sudo lsof -i:9000
 
