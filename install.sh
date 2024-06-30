@@ -46,6 +46,10 @@ sudo sed -i 's|<user_files_path>/var/lib/clickhouse/user_files/</user_files_path
 sudo chown -R clickhouse /var/lib/clickhouse /var/log/clickhouse-server /etc/clickhouse-server /etc/clickhouse-client
 sudo chown -R clickhouse /home/debian/apps
 
+# Make sure ClickHouse server is not started automatically after every reboot.
+sudo systemctl enable clickhouse-server.service
+sudo systemctl daemon-reload service
+
 # Restart Clickhouse server
 sudo service clickhouse-server restart
 
