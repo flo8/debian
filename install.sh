@@ -42,6 +42,10 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y clickhouse-server clickho
 # Update clickhouse server conf file
 sudo sed -i 's|<user_files_path>/var/lib/clickhouse/user_files/</user_files_path>|<user_files_path>/home/debian/apps</user_files_path>|g' /etc/clickhouse-server/config.xml
 
+# Set proper permissions
+sudo chown -R clickhouse /var/lib/clickhouse /var/log/clickhouse-server /etc/clickhouse-server /etc/clickhouse-client
+sudo chown -R clickhouse /home/debian/apps
+
 # Restart Clickhouse server
 sudo service clickhouse-server restart
 
