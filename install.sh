@@ -49,6 +49,8 @@ mkdir /home/debian/agent
 sudo apt-get install -y acl
 sudo setfacl -m u:clickhouse:rx /home/debian/apps
 sudo setfacl -m d:u:clickhouse:rx /home/debian/apps
+# sudo setfacl -m u:debian:rwx /home/debian/apps
+# sudo setfacl -m d:u:debian:rwx /home/debian/apps
 # sudo chown -R clickhouse /home/debian/apps
 
 # Make sure ClickHouse server is not started automatically after every reboot.
