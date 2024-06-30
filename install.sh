@@ -48,6 +48,9 @@ mkdir /home/debian/agent
 sudo setfacl -R -m u:clickhouse:rx /home/debian/apps
 sudo setfacl -R -m d:u:clickhouse:rx /home/debian/apps
 
+# Set default ACL for the directory and all future subdirectories and files
+sudo setfacl -m default:u:clickhouse:rx /home/debian/apps
+
 # Make sure ClickHouse server is not started automatically after every reboot.
 sudo systemctl enable clickhouse-server.service
 sudo systemctl daemon-reload service
