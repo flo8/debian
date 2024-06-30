@@ -67,7 +67,7 @@ timedatectl status
 
 # Set correct permission and default security values
 # Note that LogLevel is MANDATORY for fail2ban
-sudo cat <<EOF >> /etc/ssh/sshd_config
+cat <<EOF | sudo tee -a /etc/ssh/sshd_config
 LogLevel INFO
 LoginGraceTime 1m
 PermitRootLogin prohibit-password
