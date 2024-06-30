@@ -38,7 +38,6 @@ sudo chmod +r /usr/share/keyrings/clickhouse-keyring.gpg
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] https://packages.clickhouse.com/deb stable main" | sudo tee \/etc/apt/sources.list.d/clickhouse.list
 sudo apt update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y clickhouse-server clickhouse-client clickhouse-common-static
-sudo apt install clickhouse-server clickhouse-client 
 
 # Set the time
 sudo timedatectl set-ntp true
