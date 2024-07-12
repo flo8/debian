@@ -102,5 +102,4 @@ sudo lsof -i:9000
 # Everything installed
 echo "Press Prefix + [I] to install tpm in tmux"
 
-mkdir agent
-mkdir apps
+
