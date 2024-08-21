@@ -43,7 +43,7 @@ sudo chown -R clickhouse /var/lib/clickhouse /var/log/clickhouse-server /etc/cli
 mkdir /home/debian/apps
 mkdir /home/debian/agent
 
-# Set read/execute permission for everyone on this folder
+# Set read/execute permission for everyone on this folder (important for clickhouse)
 sudo chmod -R o+x /home/debian/apps
 
 # This can be used to check later on if it worked
