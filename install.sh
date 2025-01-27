@@ -4,6 +4,9 @@ echo "Running installation script"
 # Run like this:
 # wget -qO- https://raw.githubusercontent.com/flo8/debian/main/install.sh | bash
 
+# Useful for remote ssh based install
+sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+
 # Update package lists
 sudo apt-get -y update
 
