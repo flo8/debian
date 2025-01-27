@@ -21,7 +21,7 @@ sudo apt-get -y update
 sudo apt-get -y dist-upgrade
 
 # Install necessary applications without prompting
-sudo apt-get install -y micro tmux rsync cron htop rsyslog fail2ban git lsof openssh-server
+sudo apt-get install -y micro tmux rsync cron htop rsyslog fail2ban git lsof
 
 # Download custom .tmux.conf
 wget -q -P ~/ https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf
