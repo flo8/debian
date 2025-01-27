@@ -1,42 +1,48 @@
 #!/bin/bash
 echo "Running installation script"
 
-# Run like this:
+# Run the script like this:
 # wget -qO- https://raw.githubusercontent.com/flo8/debian/main/install.sh | bash
 
-# Useful for remote ssh-based install
-sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+# Set non-interactive mode to suppress prompts
+export DEBIAN_FRONTEND=noninteractive
+
+# Ensure apt-get does not prompt about config file changes
+sudo mkdir -p /etc/apt/apt.conf.d
+echo 'Dpkg::Options {
+    "--force-confdef";
+    "--force-confold";
+};' | sudo tee /etc/apt/apt.conf.d/90forceconf
 
 # Update package lists
 sudo apt-get -y update
 
-# Upgrade packages, automatically answering yes to all prompts and keeping the current configuration files
-sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
+# Upgrade all packages automatically while keeping existing config files
+sudo apt-get -y dist-upgrade
 
-# Install apps
-# Note that rsyslog is REQUIRED for fail2ban to work properly (since Debian 12)
-sudo apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" micro tmux rsync cron htop rsyslog fail2ban git lsof
+# Install necessary applications without prompting
+sudo apt-get install -y micro tmux rsync cron htop rsyslog fail2ban git lsof openssh-server
 
-# Download .tmux.conf
-wget -P ~/ https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf
+# Download custom .tmux.conf
+wget -q -P ~/ https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf
 
-# Install TPM
+# Install TPM for tmux
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
-# Reload tmux config
+# Reload tmux configuration
 tmux source ~/.tmux.conf
 
-# Start services
+# Enable and start cron service
 sudo systemctl enable cron
 sudo systemctl start cron
 
-# A bit of cosmetic changes
+# Cosmetic changes: Add alias to bashrc
 echo "alias ls='ls --color=auto'" >> ~/.bashrc
 source ~/.bashrc
 
-# Set the time
+# Ensure system time is synced
 sudo timedatectl set-ntp true
 timedatectl status
 
-# Everything installed
-echo "Press Prefix + [I] to install tpm in tmux"
+# Indicate successful installation
+echo "Installation complete! Press Prefix + [I] to install tpm plugins in tmux."
