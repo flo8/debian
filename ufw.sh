@@ -28,3 +28,33 @@ echo "UFW status:"
 sudo ufw status verbose
 
 echo "Firewall setup complete."
+
+# Adds fail2ban configuration
+sudo wget -O /etc/fail2ban/jail.local https://raw.githubusercontent.com/flo8/debian/main/jail.local
+sudo systemctl start fail2ban
+sudo systemctl enable fail2ban
+
+# Display status of fail2ban
+sudo fail2ban-client status
+sudo fail2ban-client status sshd
+
+# Adds UFW and configure it
+wget -qO- https://raw.githubusercontent.com/flo8/debian/main/ufw.sh | bash
+
+# Set correct permission and default security values
+# Note that LogLevel is MANDATORY for fail2ban
+cat <<EOF | sudo tee -a /etc/ssh/sshd_config
+LogLevel INFO
+LoginGraceTime 1m
+PermitRootLogin prohibit-password
+StrictModes yes
+MaxAuthTries 3
+MaxSessions 5
+PubkeyAuthentication yes
+PermitEmptyPasswords no
+EOF
+
+# Check SSH is correct
+sudo sshd -t
+
+echo "Machine secured."
