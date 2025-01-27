@@ -7,27 +7,9 @@ echo "Installing prerequisites..."
 sudo dnf install -y epel-release
 sudo dnf install -y gnupg2 wget curl ca-certificates lsof
 
-# Create ClickHouse user and group if missing
-if ! id -u clickhouse >/dev/null 2>&1; then
-    echo "Creating ClickHouse user and group..."
-    sudo groupadd clickhouse
-    sudo useradd -r -g clickhouse clickhouse
-fi
-
-# Import the ClickHouse GPG key
-echo "Importing ClickHouse GPG key..."
-sudo rpm --import https://packages.clickhouse.com/rpm/clickhouse.asc
-
 # Add the ClickHouse repository
-echo "Adding ClickHouse repository..."
-cat <<EOF | sudo tee /etc/yum.repos.d/clickhouse.repo
-[clickhouse]
-name=ClickHouse Repository
-baseurl=https://packages.clickhouse.com/rpm/stable
-gpgcheck=1
-gpgkey=https://packages.clickhouse.com/rpm/clickhouse.asc
-enabled=1
-EOF
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://packages.clickhouse.com/rpm/clickhouse.repo
 
 # Update package lists
 echo "Updating package lists..."
@@ -35,7 +17,7 @@ sudo dnf makecache
 
 # Install ClickHouse components
 echo "Installing ClickHouse server and client..."
-sudo dnf install -y clickhouse-server clickhouse-client clickhouse-common-static --nogpgcheck
+sudo yum install -y clickhouse-server clickhouse-client clickhouse-common-static --nogpgcheck
 
 # Configure ClickHouse directories
 echo "Configuring ClickHouse directories..."
