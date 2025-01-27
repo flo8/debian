@@ -35,7 +35,7 @@ sudo dnf makecache
 
 # Install ClickHouse components
 echo "Installing ClickHouse server and client..."
-sudo dnf install -y clickhouse-server clickhouse-client clickhouse-common-static
+sudo dnf install -y clickhouse-server clickhouse-client clickhouse-common-static --nogpgcheck
 
 # Configure ClickHouse directories
 echo "Configuring ClickHouse directories..."
