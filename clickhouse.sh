@@ -48,3 +48,8 @@ sudo systemctl daemon-reload service
 
 # Restart Clickhouse server
 sudo service clickhouse-server restart
+
+# Check clickhouse is running
+sudo systemctl status clickhouse-server
+ps -ef | grep clickhouse
+sudo lsof -i:9000
