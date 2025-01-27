@@ -41,6 +41,18 @@ source ~/.bashrc
 sudo timedatectl set-ntp true
 timedatectl status
 
+# Adds fail2ban configuration
+sudo wget -O /etc/fail2ban/jail.local https://raw.githubusercontent.com/flo8/debian/main/jail.local
+sudo systemctl start fail2ban
+sudo systemctl enable fail2ban
+
+# Display status of fail2ban
+sudo fail2ban-client status
+sudo fail2ban-client status sshd
+
+# Adds UFW and configure it
+wget -qO- https://raw.githubusercontent.com/flo8/debian/main/ufw.sh | bash
+
 # Set correct permission and default security values
 # Note that LogLevel is MANDATORY for fail2ban
 cat <<EOF | sudo tee -a /etc/ssh/sshd_config
@@ -57,24 +69,6 @@ EOF
 # Check SSH is correct
 sudo sshd -t
 
-# Adds fail2ban configuration
-sudo wget -O /etc/fail2ban/jail.local https://raw.githubusercontent.com/flo8/debian/main/jail.local
-sudo systemctl start fail2ban
-sudo systemctl enable fail2ban
-
-# Display status of fail2ban
-sudo fail2ban-client status
-sudo fail2ban-client status sshd
-
-# Adds UFW and configure it
-wget -qO- https://raw.githubusercontent.com/flo8/debian/main/ufw.sh | bash
-
-# Check clickhouse is running
-sudo systemctl status clickhouse-server
-ps -ef | grep clickhouse
-sudo lsof -i:9000
-
 # Everything installed
 echo "Press Prefix + [I] to install tpm in tmux"
-
 
