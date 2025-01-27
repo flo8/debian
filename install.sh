@@ -28,7 +28,7 @@ sudo systemctl enable cron
 sudo systemctl start cron
 
 # Install Clickhouse
-wget -qO- https://raw.githubusercontent.com/flo8/debian/main/clickhouse.sh | bash
+# wget -qO- https://raw.githubusercontent.com/flo8/debian/main/clickhouse.sh | bash
 
 # A bit of cosmetic changes
 echo "alias ls='ls --color=auto'" >> ~/.bashrc
