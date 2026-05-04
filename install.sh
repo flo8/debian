@@ -50,7 +50,7 @@ apt-get update -y
 apt-get dist-upgrade -y
 
 log "Installing base packages"
-apt-get install -y sudo micro tmux rsync cron htop rsyslog git lsof curl wget ufw unzip openssh-server
+apt-get install -y sudo micro tmux rsync cron htop rsyslog git lsof curl wget ufw unzip jq openssh-server
 
 # ========= USER =========
 log "Creating user $USERNAME"
