@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Run this script with:
-# sudo curl -fsSL https://raw.githubusercontent.com/flo8/debian/main/install.sh | sudo bash
+# curl -fsSL https://raw.githubusercontent.com/flo8/debian/main/install.sh | sudo bash
 
 set -euo pipefail
 
