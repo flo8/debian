@@ -1,4 +1,5 @@
 #!/bin/bash
+
 echo "Running installation script"
 
 # Run the script like this:
@@ -21,13 +22,10 @@ sudo apt-get -y update
 sudo apt-get -y dist-upgrade
 
 # Install necessary applications without prompting
-sudo apt-get install -y micro tmux rsync cron htop rsyslog fail2ban git lsof
+sudo apt-get install -y micro tmux rsync cron htop rsyslog fail2ban git lsof curl wget ufw
 
 # Download custom .tmux.conf
 wget -q -P ~/ https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf
-
-# Install TPM for tmux
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # Reload tmux configuration
 tmux source ~/.tmux.conf
@@ -45,4 +43,4 @@ sudo timedatectl set-ntp true
 timedatectl status
 
 # Indicate successful installation
-echo "Installation complete! Press Prefix + [I] to install tpm plugins in tmux."
+echo "Installation complete!"
