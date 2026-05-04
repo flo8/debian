@@ -66,20 +66,17 @@ log "Setting up user $USERNAME"
 
 if ! id "$USERNAME" &>/dev/null; then
   useradd -m -s /bin/bash "$USERNAME"
+  usermod -aG sudo "$USERNAME"
 fi
 
 HOME_DIR=$(eval echo "~$USERNAME")
 SSH_DIR="$HOME_DIR/.ssh"
 AUTH_KEYS="$SSH_DIR/authorized_keys"
-
 mkdir -p "$SSH_DIR"
 chmod 700 "$SSH_DIR"
-
 touch "$AUTH_KEYS"
 chmod 600 "$AUTH_KEYS"
-
 grep -qxF "$PUBKEY" "$AUTH_KEYS" || echo "$PUBKEY" >> "$AUTH_KEYS"
-
 chown -R "$USERNAME:$USERNAME" "$SSH_DIR"
 
 # ========= UFW =========
@@ -90,14 +87,12 @@ ufw default allow outgoing
 ufw allow 22/tcp
 ufw limit 22/tcp
 ufw logging on
-
 ufw --force enable
 
 # ========= FAIL2BAN =========
 log "Configuring fail2ban"
 
 curl -fsSL "$FAIL2BAN_JAIL_URL" -o /etc/fail2ban/jail.local
-
 systemctl enable fail2ban
 systemctl restart fail2ban
 
@@ -118,6 +113,7 @@ systemctl reload ssh || systemctl reload sshd
 
 # ========= MISC =========
 log "Installing tmux config"
+
 curl -fsSL https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf -o "$HOME_DIR/.tmux.conf"
 chown "$USERNAME:$USERNAME" "$HOME_DIR/.tmux.conf"
 
@@ -139,12 +135,9 @@ fail2ban-client status || true
 log "Installing DuckDB"
 
 DUCKDB_INSTALLER=$(mktemp)
-
 curl -fsSL https://install.duckdb.org -o "$DUCKDB_INSTALLER"
-chmod +x "$DUCKDB_INSTALLER"
-
-# Run as the target user (not root)
-sudo -u "$USERNAME" "$DUCKDB_INSTALLER"
+# Run via bash (works even with noexec)
+sudo -u "$USERNAME" bash "$DUCKDB_INSTALLER"
 rm -f "$DUCKDB_INSTALLER"
 
 log "Setting hostname"
