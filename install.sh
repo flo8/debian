@@ -80,6 +80,7 @@ chmod 700 "$SSH_DIR"
 
 touch "$AUTH_KEYS"
 chmod 600 "$AUTH_KEYS"
+chown "$USERNAME:$USERNAME" "$AUTH_KEYS"
 
 grep -qxF "$PUBKEY" "$AUTH_KEYS" || echo "$PUBKEY" >> "$AUTH_KEYS"
 
