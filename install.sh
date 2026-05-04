@@ -8,6 +8,7 @@ set -euo pipefail
 # ========= CONFIG =========
 USERNAME="flo"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
+HOSTNAME="debian"
 
 # ========= HELPERS =========
 log() { echo -e "\n[+] $*"; }
@@ -139,17 +140,9 @@ chown "$USERNAME:$USERNAME" "$HOME_DIR/.bashrc"
 
 log "Final checks"
 ufw status verbose || true
-fail2ban-client status || true
-
-log "Installing DuckDB"
-
-curl -fsSL https://github.com/duckdb/duckdb/releases/latest/download/duckdb_cli-linux-amd64.zip -o /tmp/duckdb.zip 
-unzip -o /tmp/duckdb.zip -d /usr/local/bin/ 
-chmod +x /usr/local/bin/duckdb
-rm -f /tmp/duckdb.zip
 
 log "Setting hostname"
-HOSTNAME="debian"
 hostnamectl set-hostname "$HOSTNAME"
+sed -i "s/127.0.1.1.*/127.0.1.1 $HOSTNAME/" /etc/hosts || true
 
 log "✅ Machine secured and ready"
