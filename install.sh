@@ -8,7 +8,6 @@ set -euo pipefail
 # ========= CONFIG =========
 USERNAME="flo"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
-FAIL2BAN_JAIL_URL="https://raw.githubusercontent.com/flo8/debian/main/jail.local"
 
 # ========= HELPERS =========
 log() { echo -e "\n[+] $*"; }
@@ -57,9 +56,7 @@ apt-get update -y
 apt-get dist-upgrade -y
 
 log "Installing base packages"
-apt-get install -y \
-  micro tmux rsync cron htop rsyslog fail2ban \
-  git lsof curl wget ufw unzip
+apt-get install -y micro tmux rsync cron htop rsyslog git lsof curl wget ufw unzip
 
 # ========= USER SETUP =========
 log "Setting up user $USERNAME"
@@ -99,24 +96,26 @@ ufw limit 22/tcp
 ufw logging on
 ufw --force enable
 
-# ========= FAIL2BAN =========
-log "Configuring fail2ban"
-
-curl -fsSL "$FAIL2BAN_JAIL_URL" -o /etc/fail2ban/jail.local
-systemctl enable fail2ban
-systemctl restart fail2ban
-
 # ========= SSH HARDENING =========
 log "Hardening SSH"
 
 set_sshd_option "LogLevel" "INFO"
 set_sshd_option "LoginGraceTime" "1m"
-set_sshd_option "PermitRootLogin" "prohibit-password"
+set_sshd_option "PermitRootLogin" "no"
 set_sshd_option "StrictModes" "yes"
 set_sshd_option "MaxAuthTries" "3"
 set_sshd_option "MaxSessions" "5"
 set_sshd_option "PubkeyAuthentication" "yes"
+set_sshd_option "PasswordAuthentication" "no"
 set_sshd_option "PermitEmptyPasswords" "no"
+set_sshd_option "ChallengeResponseAuthentication" "no"
+set_sshd_option "UsePAM" "yes"
+set_sshd_option "X11Forwarding" "no"
+
+# Allow our user to SSH
+if [ -n "$USERNAME" ]; then
+  set_sshd_option "AllowUsers" "$USERNAME"
+fi
 
 sshd -t
 systemctl reload ssh || systemctl reload sshd
