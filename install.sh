@@ -61,7 +61,7 @@ apt-get update -y
 apt-get dist-upgrade -y
 
 log "Installing base packages"
-apt-get install -y micro tmux rsync cron htop rsyslog git lsof curl wget ufw unzip
+apt-get install -y sudo micro tmux rsync cron htop rsyslog git lsof curl wget ufw unzip
 
 # ========= USER SETUP =========
 log "Setting up user $USERNAME"
