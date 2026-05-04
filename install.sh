@@ -134,11 +134,10 @@ fail2ban-client status || true
 
 log "Installing DuckDB"
 
-DUCKDB_INSTALLER=$(mktemp)
-curl -fsSL https://install.duckdb.org -o "$DUCKDB_INSTALLER"
-# Run via bash (works even with noexec)
-sudo -u "$USERNAME" bash "$DUCKDB_INSTALLER"
-rm -f "$DUCKDB_INSTALLER"
+curl -fsSL https://github.com/duckdb/duckdb/releases/latest/download/duckdb_cli-linux-amd64.zip -o /tmp/duckdb.zip 
+unzip -o /tmp/duckdb.zip -d /usr/local/bin/ 
+chmod +x /usr/local/bin/duckdb
+rm -f /tmp/duckdb.zip
 
 log "Setting hostname"
 HOSTNAME="debian"
