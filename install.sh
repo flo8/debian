@@ -66,18 +66,28 @@ log "Setting up user $USERNAME"
 
 if ! id "$USERNAME" &>/dev/null; then
   useradd -m -s /bin/bash "$USERNAME"
+fi
+
+if ! id -nG "$USERNAME" | grep -qw sudo; then
   usermod -aG sudo "$USERNAME"
 fi
 
-HOME_DIR=$(eval echo "~$USERNAME")
+HOME_DIR=$(getent passwd "$USERNAME" | cut -d: -f6)
 SSH_DIR="$HOME_DIR/.ssh"
 AUTH_KEYS="$SSH_DIR/authorized_keys"
+
 mkdir -p "$SSH_DIR"
+chown -R "$USERNAME:$USERNAME" "$SSH_DIR"
 chmod 700 "$SSH_DIR"
+
 touch "$AUTH_KEYS"
 chmod 600 "$AUTH_KEYS"
+
 grep -qxF "$PUBKEY" "$AUTH_KEYS" || echo "$PUBKEY" >> "$AUTH_KEYS"
-chown -R "$USERNAME:$USERNAME" "$SSH_DIR"
+
+# Air360 directory
+log "Creating /usr/local/air360 directory"
+install -d -m 755 -o "$USERNAME" -g "$USERNAME" /usr/local/air360
 
 # ========= UFW =========
 log "Configuring UFW"
