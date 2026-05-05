@@ -14,27 +14,30 @@ set -euo pipefail
 #   curl -fsSL -o install.sh https://raw.githubusercontent.com/flo8/debian/main/install.sh
 #   sudo bash install.sh
 #
-# ⚠️ REQUIREMENTS:
+# REQUIREMENTS:
 # - Debian 12+ / 13
 # - Root or sudo access
 # - SSH key ready for user login
 #
-# ===========================================================================
+# ============================================================================
 
 # ========= CONFIG =========
 USERNAME="flo"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
-BASHRC_URL="https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/main/.bashrc"
 HOSTNAME="debian"
 
 # ========= HELPERS =========
 log() { echo -e "\n[+] $*"; }
 
+die() { echo -e "\n[!] ERROR: $*" >&2; exit 1; }
+
+fetch() {
+  local url="$1" dest="$2"
+  curl -fsSL "$url" -o "$dest" || die "Failed to download: $url"
+}
+
 require_root() {
-  if [ "$(id -u)" -ne 0 ]; then
-    echo "Run as root"
-    exit 1
-  fi
+  [ "$(id -u)" -eq 0 ] || die "Run as root"
 }
 
 require_root
@@ -42,7 +45,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # ========= BOOT =========
 echo -e "\n\033[1;35m╔══════════════════════════════════════╗\033[0m"
-echo -e "\033[1;35m║   INITIALIZING... version 1.0.2      ║\033[0m"
+echo -e "\033[1;35m║   INITIALIZING... version 1.0.3      ║\033[0m"
 echo -e "\033[1;35m╚══════════════════════════════════════╝\033[0m"
 
 # ========= SYSTEM =========
@@ -51,7 +54,10 @@ apt-get update -y
 apt-get dist-upgrade -y
 
 log "Installing base packages"
-apt-get install -y sudo micro tmux rsync cron htop rsyslog git lsof curl wget tree mc fzf bat strace ufw unzip s3cmd jq openssh-server
+apt-get install -y \
+  sudo micro tmux rsync cron htop rsyslog git lsof curl wget \
+  tree mc fzf bat strace ufw unzip s3cmd jq openssh-server \
+  bash-completion
 
 # ========= USER =========
 log "Creating user $USERNAME"
@@ -65,26 +71,36 @@ SSH_DIR="$HOME_DIR/.ssh"
 AUTH_KEYS="$SSH_DIR/authorized_keys"
 
 mkdir -p "$SSH_DIR"
-touch "$AUTH_KEYS"
+
+# Write key first, then lock down permissions
+grep -qxF "$PUBKEY" "$AUTH_KEYS" 2>/dev/null || echo "$PUBKEY" >> "$AUTH_KEYS"
 
 chown -R "$USERNAME:$USERNAME" "$SSH_DIR"
 chmod 700 "$SSH_DIR"
 chmod 600 "$AUTH_KEYS"
 
-grep -qxF "$PUBKEY" "$AUTH_KEYS" || echo "$PUBKEY" >> "$AUTH_KEYS"
+# ========= BASHRC =========
+log "Installing bashrc"
 
-# Download new bashrc
-mkdir -p "$HOME_DIR/.config/bash"
-curl -fsSL "https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/main/bashrc_custom" -o "$HOME_DIR/.config/bash/bashrc_custom"
-chown -R "$USERNAME:$USERNAME" "$HOME_DIR/.config"
-echo "✔ bash custom config installed"
+BASH_CONFIG_DIR="$HOME_DIR/.config/bash"
+mkdir -p "$BASH_CONFIG_DIR"
 
-# ========= SUDO (NO PASSWORD - YOUR REQUIREMENT) =========
+fetch "https://raw.githubusercontent.com/flo8/debian/main/bashrc_custom" \
+  "$BASH_CONFIG_DIR/bashrc_custom"
+
+BASHRC_SOURCE_LINE="[ -f \"\$HOME/.config/bash/bashrc_custom\" ] && . \"\$HOME/.config/bash/bashrc_custom\""
+grep -qxF "$BASHRC_SOURCE_LINE" "$HOME_DIR/.bashrc" 2>/dev/null \
+  || echo "$BASHRC_SOURCE_LINE" >> "$HOME_DIR/.bashrc"
+
+chown -R "$USERNAME:$USERNAME" "$BASH_CONFIG_DIR" "$HOME_DIR/.bashrc"
+echo "✔ bashrc installed"
+
+# ========= SUDO (PASSWORDLESS) =========
 log "Configuring passwordless sudo"
 
-echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-$USERNAME
-chmod 440 /etc/sudoers.d/90-$USERNAME
-visudo -cf /etc/sudoers.d/90-$USERNAME
+echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/90-$USERNAME"
+chmod 440 "/etc/sudoers.d/90-$USERNAME"
+visudo -cf "/etc/sudoers.d/90-$USERNAME"
 
 # ========= DIRECTORY =========
 log "Creating /usr/local/air360"
@@ -116,45 +132,49 @@ set_sshd() {
   fi
 }
 
-set_sshd "PermitRootLogin" "no"
-set_sshd "PubkeyAuthentication" "yes"
-set_sshd "PasswordAuthentication" "no"
-set_sshd "PermitEmptyPasswords" "no"
-set_sshd "ChallengeResponseAuthentication" "no"
-set_sshd "UsePAM" "yes"
-set_sshd "StrictModes" "yes"
-set_sshd "MaxAuthTries" "3"
-set_sshd "MaxSessions" "5"
-set_sshd "LoginGraceTime" "1m"
-set_sshd "LogLevel" "INFO"
-set_sshd "X11Forwarding" "no"
-set_sshd "AllowUsers" "$USERNAME"
+set_sshd "PermitRootLogin"               "no"
+set_sshd "PubkeyAuthentication"          "yes"
+set_sshd "PasswordAuthentication"        "no"
+set_sshd "PermitEmptyPasswords"          "no"
+set_sshd "KbdInteractiveAuthentication"  "no"   # replaces deprecated ChallengeResponseAuthentication
+set_sshd "UsePAM"                        "yes"
+set_sshd "StrictModes"                   "yes"
+set_sshd "MaxAuthTries"                  "3"
+set_sshd "MaxSessions"                   "5"
+set_sshd "LoginGraceTime"               "1m"
+set_sshd "LogLevel"                      "INFO"
+set_sshd "X11Forwarding"                 "no"
+set_sshd "AllowUsers"                    "$USERNAME"
+set_sshd "ClientAliveInterval"           "300"
+set_sshd "ClientAliveCountMax"           "2"
 
-sshd -t
-systemctl reload ssh || systemctl reload sshd
+sshd -t || die "sshd config validation failed — check $SSHD"
+systemctl restart ssh || systemctl restart sshd
 
 # ========= SERVICES =========
 log "Enabling services"
-systemctl enable cron
-systemctl start cron
+systemctl enable --now cron
 timedatectl set-ntp true
 
 # ========= TMUX =========
 log "Installing tmux config"
 
-curl -fsSL https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf \
-  -o "$HOME_DIR/.tmux.conf"
-
+fetch "https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf" \
+  "$HOME_DIR/.tmux.conf"
 chown "$USERNAME:$USERNAME" "$HOME_DIR/.tmux.conf"
 
 # ========= HOSTNAME =========
 log "Setting hostname"
 
 hostnamectl set-hostname "$HOSTNAME"
-sed -i "s/127.0.1.1.*/127.0.1.1 $HOSTNAME/" /etc/hosts || true
+if grep -q "^127.0.1.1" /etc/hosts; then
+  sed -i "s/^127.0.1.1.*/127.0.1.1 $HOSTNAME/" /etc/hosts
+else
+  echo "127.0.1.1 $HOSTNAME" >> /etc/hosts
+fi
 
 # ========= DONE =========
-log "Final check"
-ufw status verbose || true
+log "Firewall status"
+ufw status verbose
 
-log "✅ DONE - system ready"
+log "✅ DONE — system ready. SSH as $USERNAME using your key."
