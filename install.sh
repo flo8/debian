@@ -58,7 +58,7 @@ log "Installing base packages"
 apt-get install -y \
   sudo micro tmux rsync cron htop rsyslog git lsof curl wget \
   tree mc fzf bat strace ufw unzip s3cmd jq openssh-server \
-  bash-completion
+  bash-completion nvim hx 
 
 # ========= USER =========
 log "Creating user $USERNAME"
