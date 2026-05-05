@@ -24,6 +24,7 @@ set -euo pipefail
 # ========= CONFIG =========
 USERNAME="flo"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
+BASHRC_URL="https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/main/.bashrc"
 HOSTNAME="debian"
 
 # ========= HELPERS =========
@@ -50,7 +51,7 @@ apt-get update -y
 apt-get dist-upgrade -y
 
 log "Installing base packages"
-apt-get install -y sudo micro tmux rsync cron htop rsyslog git lsof curl wget ufw unzip s3cmd jq openssh-server
+apt-get install -y sudo micro tmux rsync cron htop rsyslog git lsof curl wget tree mc fzf bat strace ufw unzip s3cmd jq openssh-server
 
 # ========= USER =========
 log "Creating user $USERNAME"
@@ -71,6 +72,12 @@ chmod 700 "$SSH_DIR"
 chmod 600 "$AUTH_KEYS"
 
 grep -qxF "$PUBKEY" "$AUTH_KEYS" || echo "$PUBKEY" >> "$AUTH_KEYS"
+
+# Download new bashrc
+mkdir -p "$HOME_DIR/.config/bash"
+curl -fsSL "https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/main/bashrc_custom" -o "$HOME_DIR/.config/bash/bashrc_custom"
+chown -R "$USERNAME:$USERNAME" "$HOME_DIR/.config"
+echo "✔ bash custom config installed"
 
 # ========= SUDO (NO PASSWORD - YOUR REQUIREMENT) =========
 log "Configuring passwordless sudo"
@@ -139,10 +146,6 @@ curl -fsSL https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf \
   -o "$HOME_DIR/.tmux.conf"
 
 chown "$USERNAME:$USERNAME" "$HOME_DIR/.tmux.conf"
-
-# ========= SHELL =========
-echo "alias ls='ls --color=auto'" >> "$HOME_DIR/.bashrc"
-chown "$USERNAME:$USERNAME" "$HOME_DIR/.bashrc"
 
 # ========= HOSTNAME =========
 log "Setting hostname"
