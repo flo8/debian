@@ -100,4 +100,4 @@ __fzf_history() {
         READLINE_POINT=${#READLINE_LINE}
     fi
 }
-bind -x '"\C-f": __fzf_history'
+bind -x '"\C-r": __fzf_history'
