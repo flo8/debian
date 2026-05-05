@@ -24,6 +24,7 @@ set -euo pipefail
 # ========= CONFIG =========
 USERNAME="flo"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
+REPO_RAW="https://raw.githubusercontent.com/flo8/debian/main"
 HOSTNAME="debian"
 
 # ========= HELPERS =========
@@ -85,12 +86,11 @@ log "Installing bashrc"
 BASH_CONFIG_DIR="$HOME_DIR/.config/bash"
 mkdir -p "$BASH_CONFIG_DIR"
 
-fetch "https://raw.githubusercontent.com/flo8/debian/main/bashrc_custom" \
-  "$BASH_CONFIG_DIR/bashrc_custom"
+# Get our remote bashrc
+fetch "$REPO_RAW/bashrc" "$BASH_CONFIG_DIR/bashrc"
 
-BASHRC_SOURCE_LINE="[ -f \"\$HOME/.config/bash/bashrc_custom\" ] && . \"\$HOME/.config/bash/bashrc_custom\""
-grep -qxF "$BASHRC_SOURCE_LINE" "$HOME_DIR/.bashrc" 2>/dev/null \
-  || echo "$BASHRC_SOURCE_LINE" >> "$HOME_DIR/.bashrc"
+BASHRC_SOURCE_LINE="[ -f \"\$HOME/.config/bash/bashrc\" ] && . \"\$HOME/.config/bash/bashrc\""
+grep -qxF "$BASHRC_SOURCE_LINE" "$HOME_DIR/.bashrc" 2>/dev/null || echo "$BASHRC_SOURCE_LINE" >> "$HOME_DIR/.bashrc"
 
 chown -R "$USERNAME:$USERNAME" "$BASH_CONFIG_DIR" "$HOME_DIR/.bashrc"
 echo "✔ bashrc installed"
@@ -159,8 +159,7 @@ timedatectl set-ntp true
 # ========= TMUX =========
 log "Installing tmux config"
 
-fetch "https://raw.githubusercontent.com/flo8/debian/main/.tmux.conf" \
-  "$HOME_DIR/.tmux.conf"
+fetch "$REPO_RAW/.tmux.conf" "$HOME_DIR/.tmux.conf"
 chown "$USERNAME:$USERNAME" "$HOME_DIR/.tmux.conf"
 
 # ========= HOSTNAME =========
