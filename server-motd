@@ -1,0 +1,17 @@
+#!/bin/bash
+
+HOST="$(hostname)"
+UPTIME="$(uptime -p | sed 's/up //')"
+LOAD="$(awk '{print $1, $2, $3}' /proc/loadavg)"
+MEM="$(free -h | awk '/Mem:/ {print $3 "/" $2}')"
+DISK="$(df -h / | awk 'NR==2 {print $3 "/" $2 " (" $5 ")"}')"
+IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+
+echo "▣ $HOST"
+echo "────────────────────────"
+echo "uptime : $UPTIME"
+echo "load   : $LOAD"
+echo "ram    : $MEM"
+echo "disk   : $DISK"
+echo "ip     : $IP"
+echo ""
