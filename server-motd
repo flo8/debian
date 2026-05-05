@@ -1,19 +1,37 @@
 #!/bin/bash
-
 # colors
 PUR='\033[0;35m'
 GRN='\033[0;32m'
 YLW='\033[0;33m'
 CYN='\033[0;36m'
+RED='\033[0;31m'
 RST='\033[0m'
-
 # VARIABLES
 HOST="$(hostname)"
 UPTIME="$(uptime -p | sed 's/up //')"
 LOAD="$(awk '{print $1, $2, $3}' /proc/loadavg)"
 MEM="$(free -h | awk '/Mem:/ {print $3 "/" $2}')"
-DISK="$(df -h / | awk 'NR==2 {print $3 "/" $2 " (" $5 ")"}')"
+DISK="$(df -h / | awk 'NR==2 {print $3 "/" $2}')"
+DISK_PCT="$(df / | awk 'NR==2 {print $5}' | tr -d '%')"
 IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+
+# DISK BAR
+disk_bar() {
+  local pct=$1
+  local width=12
+  local filled=$(( pct * width / 100 ))
+  local empty=$(( width - filled ))
+  local bar="["
+  for ((i=0; i<filled; i++)); do bar+="■"; done
+  for ((i=0; i<empty; i++)); do bar+="□"; done
+  bar+="]"
+
+  local color=$GRN
+  (( pct >= 80 )) && color=$YLW
+  (( pct >= 90 )) && color=$RED
+
+  echo -e "${color}${bar} ${pct}%${RST}"
+}
 
 # PRINT
 echo -e "${PUR}▣ $HOST${RST}"
@@ -21,7 +39,7 @@ echo -e "${PUR}─────────────────────�
 echo -e "${YLW}uptime${RST} : $UPTIME"
 echo -e "${YLW}load${RST}   : $LOAD"
 echo -e "${YLW}ram${RST}    : ${GRN}$MEM${RST}"
-echo -e "${YLW}disk${RST}   : ${GRN}$DISK${RST}"
+echo -e "${YLW}disk${RST}   : ${GRN}$DISK${RST} $(disk_bar $DISK_PCT)"
 echo -e "${YLW}ip${RST}     : ${GRN}$IP${RST}"
 echo -e "${PUR}────────────────────────${RST}"
 echo -e "${YLW}tips${RST}"
