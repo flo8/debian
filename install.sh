@@ -46,7 +46,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # ========= BOOT =========
 echo -e "\n\033[1;35m╔══════════════════════════════════════╗\033[0m"
-echo -e "\033[1;35m║   INITIALIZING... version 1.0.6      ║\033[0m"
+echo -e "\033[1;35m║   INITIALIZING... version 1.0.7      ║\033[0m"
 echo -e "\033[1;35m╚══════════════════════════════════════╝\033[0m"
 
 # ========= SYSTEM =========
@@ -174,6 +174,7 @@ fi
 
 # ========= BETTER (USEFUL) MOTD =========
 log "Installing MOTD..."
+sudo truncate -s 0 /etc/motd
 sudo mkdir -p /etc/update-motd.d
 fetch "$REPO_RAW/server-motd" "/etc/update-motd.d/01-status"
 sudo chmod +x /etc/update-motd.d/01-status
