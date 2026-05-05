@@ -27,7 +27,6 @@ echo -e "${PUR}─────────────────────�
 echo -e "${YLW}tips${RST}"
 echo -e "  ${CYN}ctrl+r${RST}  history search"
 echo -e "  ${CYN}editors${RST} vim · hx · micro"
-echo -e "  ${CYN}admin${RST}   htop"
-echo -e "  ${CYN}other${RST}   tmux"
+echo -e "  ${CYN}installed${RST} htop, ufw, tmux, tree, strace, ufw, mc, s3cmd, fzf, bat"
 echo -e "${PUR}────────────────────────${RST}"
 echo ""
