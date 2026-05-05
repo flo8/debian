@@ -51,7 +51,7 @@ __prompt_color() {
     local blue='\[\e[1;34m\]'
     local white='\[\e[0m\]'
 
-    PS1="${green}\u${white}@${cyan}\h${white}:${blue}\w${white}\$ ${reset}"
+     PS1="\[\e[45;1;97m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ "
 }
 __prompt_color
 
