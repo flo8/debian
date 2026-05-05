@@ -9,11 +9,6 @@ set -euo pipefail
 #
 #   curl -fsSL https://raw.githubusercontent.com/flo8/debian/main/install.sh | sudo bash
 #
-# OR safer (better for debugging):
-#
-#   curl -fsSL -o install.sh https://raw.githubusercontent.com/flo8/debian/main/install.sh
-#   sudo bash install.sh
-#
 # REQUIREMENTS:
 # - Debian 12+ / 13
 # - Root or sudo access
