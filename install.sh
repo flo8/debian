@@ -173,12 +173,10 @@ else
 fi
 
 # ========= BETTER (USEFUL) MOTD =========
-install_motd() {
-    echo "Installing MOTD..."
-    sudo mkdir -p /etc/update-motd.d
-    fetch "$REPO_RAW/server-motd" "/etc/update-motd.d/01-status"
-    sudo chmod +x /etc/update-motd.d/01-status
-}
+log "Installing MOTD..."
+sudo mkdir -p /etc/update-motd.d
+fetch "$REPO_RAW/server-motd" "/etc/update-motd.d/01-status"
+sudo chmod +x /etc/update-motd.d/01-status
 
 # ========= DONE =========
 log "Firewall status"
