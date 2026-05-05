@@ -4,8 +4,10 @@
 PUR='\033[0;35m'
 GRN='\033[0;32m'
 YLW='\033[0;33m'
+CYN='\033[0;36m'
 RST='\033[0m'
 
+# VARIABLES
 HOST="$(hostname)"
 UPTIME="$(uptime -p | sed 's/up //')"
 LOAD="$(awk '{print $1, $2, $3}' /proc/loadavg)"
@@ -13,6 +15,7 @@ MEM="$(free -h | awk '/Mem:/ {print $3 "/" $2}')"
 DISK="$(df -h / | awk 'NR==2 {print $3 "/" $2 " (" $5 ")"}')"
 IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
 
+# PRINT
 echo -e "${PUR}▣ $HOST${RST}"
 echo -e "${PUR}────────────────────────${RST}"
 echo -e "${YLW}uptime${RST} : $UPTIME"
@@ -20,5 +23,11 @@ echo -e "${YLW}load${RST}   : $LOAD"
 echo -e "${YLW}ram${RST}    : ${GRN}$MEM${RST}"
 echo -e "${YLW}disk${RST}   : ${GRN}$DISK${RST}"
 echo -e "${YLW}ip${RST}     : ${GRN}$IP${RST}"
+echo -e "${PUR}────────────────────────${RST}"
+echo -e "${YLW}tips${RST}"
+echo -e "  ${CYN}ctrl+r${RST}  history search"
+echo -e "  ${CYN}editors${RST} vim · hx · micro"
+echo -e "  ${CYN}admin${RST}   htop"
+echo -e "  ${CYN}other${RST}   tmux"
 echo -e "${PUR}────────────────────────${RST}"
 echo ""
