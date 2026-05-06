@@ -23,7 +23,9 @@ REPO_RAW="https://raw.githubusercontent.com/flo8/debian/main"
 HOSTNAME="debian"
 
 # ========= HELPERS =========
-log() { echo -e "\n[+] $*"; }
+log() {
+  echo -e "\n\033[0;35m[+] $*\033[0m"
+}
 
 die() { echo -e "\n[!] ERROR: $*" >&2; exit 1; }
 
