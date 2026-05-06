@@ -159,6 +159,28 @@ log "Installing tmux config"
 fetch "$REPO_RAW/.tmux.conf" "$HOME_DIR/.tmux.conf"
 chown "$USERNAME:$USERNAME" "$HOME_DIR/.tmux.conf"
 
+# ========= MICRO =========
+log "Configuring micro"
+
+MICRO_DIR="$HOME_DIR/.config/micro"
+MICRO_SETTINGS="$MICRO_DIR/settings.json"
+
+mkdir -p "$MICRO_DIR"
+
+# Fetch version-controlled config (recommended)
+fetch "$REPO_RAW/micro-settings.json" "$MICRO_SETTINGS"
+
+# Fallback if fetch fails (extra safety)
+if [ ! -s "$MICRO_SETTINGS" ]; then
+  cat > "$MICRO_SETTINGS" <<'EOF'
+{
+  "ft:env": "sh"
+}
+EOF
+fi
+
+chown -R "$USERNAME:$USERNAME" "$MICRO_DIR"
+
 # ========= HOSTNAME =========
 log "Setting hostname"
 
