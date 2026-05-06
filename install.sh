@@ -176,6 +176,9 @@ sudo mkdir -p /etc/update-motd.d
 fetch "$REPO_RAW/server-motd" "/etc/update-motd.d/01-status"
 sudo chmod +x /etc/update-motd.d/01-status
 
+# ========= BULLETPROOF OWNERSHIP =========
+chown -R "$USERNAME:$USERNAME" "$HOME_DIR"
+
 # ========= DONE =========
 log "Firewall status"
 ufw status verbose
