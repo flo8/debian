@@ -79,7 +79,7 @@ export VISUAL=micro
 # -----------------------------
 # PATH
 # -----------------------------
-export PATH="$HOME/.local/bin:/usr/local/air360:$PATH"
+export PATH="$HOME/.local/bin:/usr/local/air360:$PATH:/usr/sbin:/sbin"
 
 # -----------------------------
 # Bash completion
