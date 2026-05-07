@@ -104,6 +104,13 @@ grep -qxF "$BASHRC_SOURCE_LINE" "$HOME_DIR/.bashrc" 2>/dev/null || echo "$BASHRC
 chown -R "$USERNAME:$USERNAME" "$BASH_CONFIG_DIR" "$HOME_DIR/.bashrc"
 echo "✔ bashrc installed"
 
+# ========= SCRIPT TO ADD NEW USERS =========
+log "Download adduser.sh script"
+
+fetch "$REPO_RAW/adduser.sh" "$HOME_DIR/bin/adduser"
+chmod +x "$HOME_DIR/bin/adduser"
+chown -R "$USERNAME:$USERNAME" "$HOME_DIR/bin"
+
 # ========= SUDO (PASSWORDLESS) =========
 log "Configuring passwordless sudo"
 
@@ -207,3 +214,4 @@ log "Firewall status"
 ufw status verbose
 
 log "✅ DONE — system ready. SSH as $USERNAME using your key."
+log "Once logged with $USERNAME add new users with ./adduser.sh script"
