@@ -141,7 +141,6 @@ set_sshd "MaxSessions"                   "5"
 set_sshd "LoginGraceTime"               "1m"
 set_sshd "LogLevel"                      "INFO"
 set_sshd "X11Forwarding"                 "no"
-set_sshd "AllowUsers"                    "$USERNAME"
 set_sshd "ClientAliveInterval"           "300"
 set_sshd "ClientAliveCountMax"           "2"
 
