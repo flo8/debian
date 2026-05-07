@@ -55,7 +55,7 @@ log "Installing base packages"
 apt-get install -y \
   sudo micro tmux rsync cron htop rsyslog git lsof curl wget \
   tree mc fzf bat strace ufw unzip s3cmd jq openssh-server \
-  bash-completion hx ncdu linux-tools-generic dnsutils 
+  bash-completion hx ncdu linux-tools-generic dnsutils duf iftop dstat
 
 # ========= USER =========
 log "Creating user $USERNAME"
