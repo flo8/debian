@@ -54,7 +54,7 @@ apt-get dist-upgrade -y
 log "Installing base packages"
 apt-get install -y \
   sudo micro tmux rsync cron htop rsyslog git lsof curl wget \
-  tree mc fzf bat strace ufw unzip s3cmd jq openssh-server zsh \
+  tree mc fzf bat strace ufw unzip s3cmd jq openssh-server zsh sysstat \
   bash-completion hx ncdu linux-tools-generic dnsutils duf iftop dstat
 
 # ========= USER =========
