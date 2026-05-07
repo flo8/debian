@@ -82,6 +82,11 @@ export VISUAL=micro
 export PATH="$HOME/.local/bin:/usr/local/air360:$PATH:/usr/sbin:/sbin"
 
 # -----------------------------
+# USEFUL ALIASES
+# -----------------------------
+alias myip='dig +short myip.opendns.com @resolver1.opendns.com'
+
+# -----------------------------
 # Bash completion
 # -----------------------------
 if [ -f /usr/share/bash-completion/bash_completion ]; then
