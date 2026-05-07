@@ -84,7 +84,7 @@ export PATH="$HOME/.local/bin:/usr/local/air360:$PATH:/usr/sbin:/sbin"
 # -----------------------------
 # USEFUL ALIASES
 # -----------------------------
-alias myip='dig +short myip.opendns.com @resolver1.opendns.com'
+alias myip='ip=$(dig +short myip.opendns.com @resolver1.opendns.com | head -n1); printf "\033[1;35m%s\033[0m\n" "$ip"'
 
 # -----------------------------
 # Bash completion
