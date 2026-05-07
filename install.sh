@@ -77,6 +77,18 @@ chown -R "$USERNAME:$USERNAME" "$SSH_DIR"
 chmod 700 "$SSH_DIR"
 chmod 600 "$AUTH_KEYS"
 
+# ========= SSH USERS GROUP =========
+log "Setting up sshusers group"
+
+# Create group if it doesn't exist
+getent group sshusers >/dev/null || groupadd sshusers
+
+# Add main user
+usermod -aG sshusers "$USERNAME"
+
+# Check
+id -nG "$USERNAME" | grep -qw sshusers || die "User not in sshusers group"
+
 # ========= BASHRC =========
 log "Installing bashrc"
 
@@ -102,16 +114,6 @@ visudo -cf "/etc/sudoers.d/90-$USERNAME"
 # ========= DIRECTORY =========
 log "Creating /usr/local/air360"
 install -d -m 755 -o "$USERNAME" -g "$USERNAME" /usr/local/air360
-
-# ========= UFW =========
-log "Configuring firewall"
-
-ufw default deny incoming
-ufw default allow outgoing
-ufw allow 22/tcp
-ufw limit 22/tcp
-ufw logging on
-ufw --force enable
 
 # ========= SSH HARDENING =========
 log "Hardening SSH"
@@ -143,9 +145,20 @@ set_sshd "LogLevel"                      "INFO"
 set_sshd "X11Forwarding"                 "no"
 set_sshd "ClientAliveInterval"           "300"
 set_sshd "ClientAliveCountMax"           "2"
-
+set_sshd "AllowGroups"                   "sshusers"
+ 
 sshd -t || die "sshd config validation failed — check $SSHD"
 systemctl restart ssh || systemctl restart sshd
+
+# ========= UFW =========
+log "Configuring firewall"
+
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 22/tcp
+ufw limit 22/tcp
+ufw logging on
+ufw --force enable
 
 # ========= SERVICES =========
 log "Enabling services"
@@ -181,10 +194,10 @@ fi
 
 # ========= BETTER (USEFUL) MOTD =========
 log "Installing MOTD..."
-sudo truncate -s 0 /etc/motd
-sudo mkdir -p /etc/update-motd.d
+truncate -s 0 /etc/motd
+mkdir -p /etc/update-motd.d
 fetch "$REPO_RAW/server-motd" "/etc/update-motd.d/01-status"
-sudo chmod +x /etc/update-motd.d/01-status
+chmod +x /etc/update-motd.d/01-status
 
 # ========= BULLETPROOF OWNERSHIP =========
 chown -R "$USERNAME:$USERNAME" "$HOME_DIR"
