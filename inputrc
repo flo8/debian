@@ -1,0 +1,87 @@
+# ~/.inputrc
+# Readline configuration
+#
+# Affects:
+# - Bash
+# - many terminal applications
+#
+# Reload manually with:
+#   bind -f ~/.inputrc
+
+# --------------------------------------------------
+# Completion behavior
+# --------------------------------------------------
+
+# Show completion list immediately on ambiguous TAB
+# instead of requiring double TAB.
+set show-all-if-ambiguous on
+
+# Ignore case during completion.
+# Example:
+#   cd doc<TAB>
+# matches:
+#   Documents
+set completion-ignore-case on
+
+# Show colored completion entries.
+set colored-stats on
+
+# Show visible markers for file types:
+#   / = directory
+#   * = executable
+#   @ = symlink
+set visible-stats on
+
+# Add slash automatically after symlinked directories.
+set mark-symlinked-directories on
+
+# Show common prefix while cycling completions.
+set menu-complete-display-prefix on
+
+# Never ask:
+#   "Display all 500 possibilities?"
+set completion-query-items -1
+
+# --------------------------------------------------
+# TAB completion style
+# --------------------------------------------------
+
+# TAB cycles forward through matches.
+TAB: menu-complete
+
+# Shift+TAB cycles backward.
+"\e[Z": menu-complete-backward
+
+# --------------------------------------------------
+# History search
+# --------------------------------------------------
+
+# UP arrow searches backward using current prefix.
+#
+# Example:
+#   typing:
+#     docker
+#   then pressing UP
+# searches previous docker commands only.
+"\e[A": history-search-backward
+
+# DOWN arrow searches forward.
+"\e[B": history-search-forward
+
+# --------------------------------------------------
+# Better editing
+# --------------------------------------------------
+
+# Enable bracketed paste mode.
+# Prevents weird indentation/paste issues.
+set enable-bracketed-paste on
+
+# Flash instead of beep.
+set bell-style visible
+
+# Use 8-bit input/output.
+set input-meta on
+set output-meta on
+
+# Allow UTF-8 characters.
+set convert-meta off
