@@ -56,7 +56,7 @@ apt-get dist-upgrade -y
 
 log "Installing base packages"
 apt-get install -y \
-  sudo micro tmux rsync cron htop rsyslog git lsof curl wget \
+  sudo vim micro tmux rsync cron htop rsyslog git lsof curl wget \
   tree mc fzf bat strace ufw unzip s3cmd jq openssh-server sysstat \
   bash-completion hx ncdu linux-cpupower linux-perf dnsutils duf iftop dstat
 
