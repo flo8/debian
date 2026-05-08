@@ -104,6 +104,14 @@ grep -qxF "$BASHRC_SOURCE_LINE" "$HOME_DIR/.bashrc" 2>/dev/null || echo "$BASHRC
 chown -R "$USERNAME:$USERNAME" "$BASH_CONFIG_DIR" "$HOME_DIR/.bashrc"
 echo "✔ bashrc installed"
 
+# ========= INPUTRC =========
+log "Installing inputrc"
+
+# Get our remote inputrc
+fetch "$REPO_RAW/inputrc" "$HOME_DIR/.inputrc"
+chown "$USERNAME:$USERNAME" "$HOME_DIR/.inputrc"
+echo "✔ inputrc installed"
+
 # ========= SCRIPT TO ADD NEW USERS =========
 log "Download adduser.sh script"
 
