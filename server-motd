@@ -34,7 +34,7 @@ disk_bar() {
 }
 
 # 3D-ASCII font on https://patorjk.com/software/taag/#p=testall&f=Bulbhead&t=air360&x=none&v=4&h=4&w=80&we=false
-echo -e "${PURPLE}"
+echo -e "${PUR}"
 cat << "EOF"
  ________  ___  ________  ________  ________  ________
 |\   __  \|\  \|\   __  \|\_____  \|\   ____\|\   __  \
@@ -44,7 +44,7 @@ cat << "EOF"
    \ \__\ \__\ \__\ \__\\ _\ |\_______\ \_______\ \_______\
     \|__|\|__|\|__|\|__|\|__|\|_______|\|_______|\|_______|
 EOF
-echo -e "${RESET}"
+echo -e "${RST}"
 
 # PRINT
 echo -e "${PUR}▣ $HOST${RST}"
@@ -57,8 +57,8 @@ echo -e "${YLW}ip${RST}     : ${GRN}$IP${RST}"
 echo -e "${PUR}────────────────────────${RST}"
 echo -e "${YLW}tips${RST}"
 echo -e "  ${CYN}ctrl+r${RST}  history search"
-echo -e "  ${CYN}editors${RST} vim · hx · micro"
-echo -e "  ${CYN}shell${RST} zsh · bash"
+echo -e "  ${CYN}editors${RST} hx · micro"
+echo -e "  ${CYN}shell${RST}   bash"
 echo -e "  ${CYN}admin${RST} ufw, tmux, tree, mc, s3cmd, fzf, bat"
 echo -e "  ${CYN}debug${RST} htop strace ncdu duf myip iftop perf dstat"
 echo -e "${PUR}────────────────────────${RST}"

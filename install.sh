@@ -10,7 +10,7 @@ set -euo pipefail
 #   curl -fsSL https://raw.githubusercontent.com/flo8/debian/main/install.sh | sudo bash
 #
 # REQUIREMENTS:
-# - Debian 12+ / 13
+# - Debian 13 (trixie)
 # - Root or sudo access
 # - SSH key ready for user login
 #
@@ -20,7 +20,10 @@ set -euo pipefail
 USERNAME="flo"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
 REPO_RAW="https://raw.githubusercontent.com/flo8/debian/main"
-HOSTNAME="debian"
+
+# Optional hostname override. Set via env: NEW_HOSTNAME=foo curl ... | sudo -E bash
+# When empty, the script leaves the system hostname unchanged.
+NEW_HOSTNAME="${NEW_HOSTNAME:-}"
 
 # ========= HELPERS =========
 log() {
@@ -54,7 +57,7 @@ apt-get dist-upgrade -y
 log "Installing base packages"
 apt-get install -y \
   sudo micro tmux rsync cron htop rsyslog git lsof curl wget \
-  tree mc fzf bat strace ufw unzip s3cmd jq openssh-server zsh sysstat \
+  tree mc fzf bat strace ufw unzip s3cmd jq openssh-server sysstat \
   bash-completion hx ncdu linux-cpupower linux-perf dnsutils duf iftop dstat
 
 # ========= USER =========
@@ -113,11 +116,14 @@ chown "$USERNAME:$USERNAME" "$HOME_DIR/.inputrc"
 echo "✔ inputrc installed"
 
 # ========= SCRIPT TO ADD NEW USERS =========
-log "Download adduser.sh script"
+# Installed as /usr/local/bin/add-sshuser:
+# - Avoids the name clash with Debian's system /usr/sbin/adduser.
+# - /usr/local/bin is in sudo's default secure_path, so `sudo add-sshuser ...` works.
+log "Download add-sshuser script"
 
-fetch "$REPO_RAW/adduser.sh" "$HOME_DIR/bin/adduser"
-chmod +x "$HOME_DIR/bin/adduser"
-chown -R "$USERNAME:$USERNAME" "$HOME_DIR/bin"
+fetch "$REPO_RAW/add-sshuser.sh" "/usr/local/bin/add-sshuser"
+chmod 0755 "/usr/local/bin/add-sshuser"
+chown root:root "/usr/local/bin/add-sshuser"
 
 # ========= SUDO (PASSWORDLESS) =========
 log "Configuring passwordless sudo"
@@ -130,42 +136,9 @@ visudo -cf "/etc/sudoers.d/90-$USERNAME"
 log "Creating /usr/local/air360"
 install -d -m 755 -o "$USERNAME" -g "$USERNAME" /usr/local/air360
 
-# ========= SSH HARDENING =========
-log "Hardening SSH"
-
-SSHD="/etc/ssh/sshd_config"
-
-set_sshd() {
-  local key="$1"
-  local value="$2"
-
-  if grep -qE "^#?\s*${key}\s+" "$SSHD"; then
-    sed -i "s|^#\?\s*${key}\s\+.*|${key} ${value}|g" "$SSHD"
-  else
-    echo "${key} ${value}" >> "$SSHD"
-  fi
-}
-
-set_sshd "PermitRootLogin"               "no"
-set_sshd "PubkeyAuthentication"          "yes"
-set_sshd "PasswordAuthentication"        "no"
-set_sshd "PermitEmptyPasswords"          "no"
-set_sshd "KbdInteractiveAuthentication"  "no"   # replaces deprecated ChallengeResponseAuthentication
-set_sshd "UsePAM"                        "yes"
-set_sshd "StrictModes"                   "yes"
-set_sshd "MaxAuthTries"                  "3"
-set_sshd "MaxSessions"                   "5"
-set_sshd "LoginGraceTime"               "1m"
-set_sshd "LogLevel"                      "INFO"
-set_sshd "X11Forwarding"                 "no"
-set_sshd "ClientAliveInterval"           "300"
-set_sshd "ClientAliveCountMax"           "2"
-set_sshd "AllowGroups"                   "sshusers"
- 
-sshd -t || die "sshd config validation failed — check $SSHD"
-systemctl restart ssh || systemctl restart sshd
-
 # ========= UFW =========
+# Configure firewall BEFORE touching sshd so that, if the sshd restart goes
+# sideways, the box is at least in a known firewall state with port 22 open.
 log "Configuring firewall"
 
 ufw default deny incoming
@@ -174,6 +147,52 @@ ufw allow 22/tcp
 ufw limit 22/tcp
 ufw logging on
 ufw --force enable
+
+# ========= SSH HARDENING =========
+# On Debian 13, /etc/ssh/sshd_config ends with `Include /etc/ssh/sshd_config.d/*.conf`,
+# and OpenSSH applies first-match-wins for most directives. Cloud images often
+# ship /etc/ssh/sshd_config.d/50-cloud-init.conf with PasswordAuthentication yes,
+# which would silently override edits to the main file.
+#
+# We drop a 01-* file so it loads BEFORE any 50-cloud-init.conf and wins.
+log "Hardening SSH (drop-in: /etc/ssh/sshd_config.d/01-hardening.conf)"
+
+SSHD_DROPIN="/etc/ssh/sshd_config.d/01-hardening.conf"
+SSHD_TMP="$(mktemp)"
+
+cat > "$SSHD_TMP" <<'EOF'
+# Managed by install.sh — do not edit by hand.
+# Loaded ahead of cloud-init drop-ins so first-match-wins favors these values.
+
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+PermitEmptyPasswords no
+KbdInteractiveAuthentication no
+UsePAM yes
+StrictModes yes
+MaxAuthTries 3
+MaxSessions 5
+LoginGraceTime 1m
+X11Forwarding no
+ClientAliveInterval 300
+ClientAliveCountMax 2
+AllowGroups sshusers
+EOF
+
+# sshd -t validates the full config (main file + includes), so we must place
+# the drop-in first. If validation fails, remove the bad drop-in immediately
+# so the live SSH config stays clean.
+mkdir -p /etc/ssh/sshd_config.d
+install -m 0644 -o root -g root "$SSHD_TMP" "$SSHD_DROPIN"
+rm -f "$SSHD_TMP"
+
+if ! sshd -t; then
+  rm -f "$SSHD_DROPIN"
+  die "sshd config validation failed — drop-in removed, live config untouched"
+fi
+
+systemctl restart ssh || systemctl restart sshd
 
 # ========= SERVICES =========
 log "Enabling services"
@@ -198,13 +217,19 @@ fetch "$REPO_RAW/micro-settings.json" "$MICRO_SETTINGS"
 chown -R "$USERNAME:$USERNAME" "$MICRO_DIR"
 
 # ========= HOSTNAME =========
-log "Setting hostname"
+# Only touch the hostname when explicitly asked. Avoids every server
+# in a fleet ending up named "debian".
+if [ -n "$NEW_HOSTNAME" ]; then
+  log "Setting hostname to $NEW_HOSTNAME"
 
-hostnamectl set-hostname "$HOSTNAME"
-if grep -q "^127.0.1.1" /etc/hosts; then
-  sed -i "s/^127.0.1.1.*/127.0.1.1 $HOSTNAME/" /etc/hosts
+  hostnamectl set-hostname "$NEW_HOSTNAME"
+  if grep -q "^127.0.1.1" /etc/hosts; then
+    sed -i "s/^127.0.1.1.*/127.0.1.1 $NEW_HOSTNAME/" /etc/hosts
+  else
+    echo "127.0.1.1 $NEW_HOSTNAME" >> /etc/hosts
+  fi
 else
-  echo "127.0.1.1 $HOSTNAME" >> /etc/hosts
+  log "Skipping hostname change (NEW_HOSTNAME not set)"
 fi
 
 # ========= BETTER (USEFUL) MOTD =========
@@ -222,4 +247,4 @@ log "Firewall status"
 ufw status verbose
 
 log "✅ DONE — system ready. SSH as $USERNAME using your key."
-log "Once logged with $USERNAME add new users with ./adduser.sh script"
+log "Once logged in as $USERNAME, add new users with: sudo add-sshuser <username> \"<ssh-pubkey>\""

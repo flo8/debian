@@ -2,25 +2,30 @@
 set -euo pipefail
 
 # =========================================================
-# ADD USER + SSH KEY + sshusers GROUP
+# ADD-SSHUSER — create a user, add key, join sshusers group
 # =========================================================
 #
 # Creates a Linux user (if not existing), adds it to the
 # "sshusers" group, and installs the provided SSH public key.
 #
+# Named "add-sshuser" (not "adduser") to avoid shadowing
+# Debian's system /usr/sbin/adduser tool.
+#
 # ---------------------------------------------------------
 # USAGE:
 #
-#   sudo ./add-user.sh <username> "<ssh_public_key>"
+#   sudo add-sshuser <username> "<ssh_public_key>"
 #
 # EXAMPLE:
 #
-#   sudo ./add-user.sh flo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."
+#   sudo add-sshuser flo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."
 #
 # NOTES:
-# - Must be run as root (or via sudo)
-# - Ensures sshusers group exists
-# - Safe to re-run (idempotent behavior for keys)
+# - Installed by install.sh as /usr/local/bin/add-sshuser
+#   (which is in sudo's default secure_path).
+# - Must be run as root (or via sudo).
+# - Ensures sshusers group exists.
+# - Safe to re-run (idempotent behavior for keys).
 #
 # =========================================================
 

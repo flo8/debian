@@ -1,4 +1,4 @@
-# ~/.config/bash/bashrc_custom — clean Debian server setup
+# ~/.config/bash/bashrc — clean Debian server setup
 
 # -----------------------------
 # Interactive shell guard
@@ -51,14 +51,12 @@ shopt -s autocd
 # -----------------------------
 export COLORTERM=truecolor
 
-if [ -x /usr/bin/dircolors ]; then
-    eval "$(dircolors -b)"
-
-    alias ls='ls --color=auto'
-    alias grep='grep --color=auto'
-fi
-
+# Custom minimal LS_COLORS — intentionally not running dircolors,
+# since its output would be overwritten by the export below.
 export LS_COLORS="di=1;34:ln=36:so=35:pi=33:ex=1;32"
+
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
 
 # -----------------------------
 # Prompt
@@ -79,12 +77,12 @@ alias ..='cd ..'
 alias ...='cd ../..'
 
 # -----------------------------
-# bat / cat
+# bat
 # -----------------------------
-# bat is installed as batcat on Debian
+# bat is installed as batcat on Debian. Only alias `bat` — leave `cat`
+# alone so scripts and pipelines pasted into the shell behave normally.
 if command -v batcat >/dev/null 2>&1; then
     alias bat='batcat --pager=never'
-    alias cat='batcat --pager=never'
 fi
 
 # -----------------------------
@@ -123,6 +121,24 @@ fi
 #   vim **<TAB>
 #   cd **<TAB>
 #   kill -9 <TAB>
+#
+# `fzf --bash` only exists in fzf >= 0.48. Debian 12 ships 0.38 and even
+# Debian 13 stable is older than 0.48, so we source the helper scripts
+# from the apt package and only fall back to `fzf --bash` on newer fzf.
 if command -v fzf >/dev/null 2>&1; then
-    eval "$(fzf --bash)"
+
+    # Debian-shipped key bindings (CTRL+R, ALT+C, etc.)
+    if [ -f /usr/share/doc/fzf/examples/key-bindings.bash ]; then
+        . /usr/share/doc/fzf/examples/key-bindings.bash
+    fi
+
+    # Debian-shipped completion (** TAB triggers)
+    if [ -f /usr/share/bash-completion/completions/fzf ]; then
+        . /usr/share/bash-completion/completions/fzf
+    fi
+
+    # Newer fzf (>= 0.48) — single-command setup, used when the helper files are absent.
+    if [ ! -f /usr/share/doc/fzf/examples/key-bindings.bash ] && fzf --bash >/dev/null 2>&1; then
+        eval "$(fzf --bash)"
+    fi
 fi
