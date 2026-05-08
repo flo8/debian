@@ -12,15 +12,34 @@ esac
 # History
 # -----------------------------
 HISTCONTROL=ignoreboth
-shopt -s histappend
 HISTSIZE=5000
 HISTFILESIZE=10000
+
+# Append to history instead of overwriting
+shopt -s histappend
+
+# Show timestamps in history output
 export HISTTIMEFORMAT="%F %T "
 
 # -----------------------------
 # Shell behavior
 # -----------------------------
+
+# Update terminal dimensions after resize
 shopt -s checkwinsize
+
+# Fix minor spelling mistakes in cd paths
+shopt -s cdspell
+
+# Expand completed paths to full paths
+shopt -s direxpand
+
+# Automatically cd into directory names
+# Example:
+#   Downloads
+# acts like:
+#   cd Downloads
+shopt -s autocd
 
 # -----------------------------
 # Less / paging
@@ -34,6 +53,7 @@ export COLORTERM=truecolor
 
 if [ -x /usr/bin/dircolors ]; then
     eval "$(dircolors -b)"
+
     alias ls='ls --color=auto'
     alias grep='grep --color=auto'
 fi
@@ -41,17 +61,10 @@ fi
 export LS_COLORS="di=1;34:ln=36:so=35:pi=33:ex=1;32"
 
 # -----------------------------
-# Prompt (colored)
+# Prompt
 # -----------------------------
-# Colors: user=green, @=white, host=cyan, path=blue, $=white
 __prompt_color() {
-    local reset='\[\e[0m\]'
-    local green='\[\e[1;32m\]'
-    local cyan='\[\e[1;36m\]'
-    local blue='\[\e[1;34m\]'
-    local white='\[\e[0m\]'
-
-     PS1="\[\e[45;1;97m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ "
+    PS1="\[\e[45;1;97m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ "
 }
 __prompt_color
 
@@ -61,9 +74,13 @@ __prompt_color
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+
 alias ..='cd ..'
 alias ...='cd ../..'
 
+# -----------------------------
+# bat / cat
+# -----------------------------
 # bat is installed as batcat on Debian
 if command -v batcat >/dev/null 2>&1; then
     alias bat='batcat --pager=never'
@@ -82,7 +99,7 @@ export VISUAL=micro
 export PATH="$HOME/.local/bin:/usr/local/air360:$PATH:/usr/sbin:/sbin"
 
 # -----------------------------
-# USEFUL ALIASES
+# Useful aliases
 # -----------------------------
 alias myip='ip=$(dig +short myip.opendns.com @resolver1.opendns.com | head -n1); printf "\033[1;35m%s\033[0m\n" "$ip"'
 
@@ -94,15 +111,18 @@ if [ -f /usr/share/bash-completion/bash_completion ]; then
 fi
 
 # -----------------------------
-# fzf — history search (Ctrl+F)
+# fzf
 # -----------------------------
-__fzf_history() {
-    command -v fzf >/dev/null 2>&1 || return
-    local selected
-    selected=$(history | fzf --tac --no-sort | awk '{$1=""; sub(/^ /,""); print}')
-    if [ -n "$selected" ]; then
-        READLINE_LINE="$selected"
-        READLINE_POINT=${#READLINE_LINE}
-    fi
-}
-bind -x '"\C-r": __fzf_history'
+# Enable:
+# - CTRL+R fuzzy history search
+# - fuzzy file/path completion
+# - SSH host completion
+# - process completion
+#
+# Examples:
+#   vim **<TAB>
+#   cd **<TAB>
+#   kill -9 <TAB>
+if command -v fzf >/dev/null 2>&1; then
+    eval "$(fzf --bash)"
+fi
