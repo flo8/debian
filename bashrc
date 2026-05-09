@@ -18,8 +18,8 @@ HISTFILESIZE=10000
 # Append to history instead of overwriting
 shopt -s histappend
 
-# Show timestamps in history output
-export HISTTIMEFORMAT="%F %T "
+# Disable timestamps in history output
+unset HISTTIMEFORMAT
 
 # -----------------------------
 # Shell behavior
