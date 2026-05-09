@@ -60,6 +60,10 @@ apt-get install -y \
   tree mc fzf bat strace ufw unzip s3cmd jq openssh-server sysstat \
   bash-completion hx ncdu linux-cpupower linux-perf dnsutils duf iftop dstat
 
+# ========= BAT SYMLINK =========
+log "Creating bat symlink for fzf"
+ln -sf /usr/bin/batcat /usr/local/bin/bat
+
 # ========= USER =========
 log "Creating user $USERNAME"
 
