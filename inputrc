@@ -76,8 +76,8 @@ TAB: menu-complete
 # Prevents weird indentation/paste issues.
 set enable-bracketed-paste on
 
-# Flash instead of beep.
-set bell-style visible
+# Silence the bell entirely (no beep, no flash).
+set bell-style none
 
 # Use 8-bit input/output.
 set input-meta on
