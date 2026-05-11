@@ -268,23 +268,23 @@ fi
 #   cd **<TAB>
 #   kill -9 <TAB>
 #
-# `fzf --bash` only exists in fzf >= 0.48. Debian 12 ships 0.38 and even
-# Debian 13 stable is older than 0.48, so we source the helper scripts
-# from the apt package and only fall back to `fzf --bash` on newer fzf.
+# Debian 13 ships fzf 0.62, which supports `fzf --bash` (single-command setup
+# covering both key bindings and completion). Prefer it: avoids matching
+# per-file paths that drift between Debian releases (e.g. the completion file
+# moved from /usr/share/bash-completion/completions/fzf to
+# /usr/share/doc/fzf/examples/completion.bash in newer packages, which broke
+# the `**<TAB>` trigger). Fall back to sourcing the individual helpers on
+# older fzf (< 0.48) where `--bash` doesn't exist.
 if command -v fzf >/dev/null 2>&1; then
 
-    # Debian-shipped key bindings (CTRL+R, ALT+C, etc.)
-    if [ -f /usr/share/doc/fzf/examples/key-bindings.bash ]; then
-        . /usr/share/doc/fzf/examples/key-bindings.bash
-    fi
-
-    # Debian-shipped completion (** TAB triggers)
-    if [ -f /usr/share/bash-completion/completions/fzf ]; then
-        . /usr/share/bash-completion/completions/fzf
-    fi
-
-    # Newer fzf (>= 0.48) — single-command setup, used when the helper files are absent.
-    if [ ! -f /usr/share/doc/fzf/examples/key-bindings.bash ] && fzf --bash >/dev/null 2>&1; then
+    # Newer fzf (>= 0.48) — single-command setup
+    if fzf --bash >/dev/null 2>&1; then
         eval "$(fzf --bash)"
+    else
+
+        # Older fzf — source whichever Debian-shipped helpers exist
+        [ -f /usr/share/doc/fzf/examples/key-bindings.bash ] && . /usr/share/doc/fzf/examples/key-bindings.bash
+        [ -f /usr/share/doc/fzf/examples/completion.bash ]   && . /usr/share/doc/fzf/examples/completion.bash
+        [ -f /usr/share/bash-completion/completions/fzf ]    && . /usr/share/bash-completion/completions/fzf
     fi
 fi
