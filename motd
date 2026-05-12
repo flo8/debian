@@ -26,6 +26,18 @@ DISK_PCT="$(df / | awk 'NR==2 {print $5}' | tr -d '%')"
 IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
 KERNEL="$(uname -r)"
 
+# Distro name/version — sourced from /etc/os-release (the standard on Debian).
+# We use $ID ("debian") rather than $NAME ("Debian GNU/Linux") so the label
+# stays compact (e.g. "debian 13"). Falls back to "debian" if the file is missing.
+OS_ID="debian"
+OS_VERSION=""
+if [ -r /etc/os-release ]; then
+  . /etc/os-release
+  OS_ID="${ID:-debian}"
+  OS_VERSION="${VERSION_ID:-}"
+fi
+OS_LABEL="${OS_ID} ${OS_VERSION}"
+
 # Last apt update — derived from the pkgcache.bin mtime, refreshed by `apt update`.
 # Stat is instant; we render as "Nd ago" so the line stays short.
 APT_TS="$(stat -c %Y /var/cache/apt/pkgcache.bin 2>/dev/null || echo 0)"
@@ -52,9 +64,11 @@ disk_bar() {
   for ((i=0; i<empty; i++)); do bar+="□"; done
   bar+="]"
 
-  local color=$GRN
-  (( pct >= 80 )) && color=$YLW
-  (( pct >= 90 )) && color=$RED
+  # Stay dim by default — only colorize when usage gets close to full,
+  # so the bar doesn't shout for attention when nothing's wrong.
+  local color=$DIM
+  (( pct >= 70 )) && color=$YLW
+  (( pct >= 85 )) && color=$RED
 
   # printf (not echo -e) so the output keeps the same form as the rest of
   # the strings we build — $color/$RST already hold real ESC bytes.
@@ -62,7 +76,7 @@ disk_bar() {
 }
 
 # One-line header in place of the old multi-row ASCII banner.
-printf '%s═══ Welcome to Debian13 | Kernel %s ═══%s\n' "$PUR" "$KERNEL" "$RST"
+printf '%s═══ Welcome to %s | Kernel %s ═══%s\n' "$PUR" "$OS_LABEL" "$KERNEL" "$RST"
 
 # Left column: host + system stats. No separator lines now — the box draws them.
 LEFT=(
