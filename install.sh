@@ -248,6 +248,21 @@ mkdir -p "$MICRO_DIR"
 fetch "$REPO_RAW/micro-settings.json" "$MICRO_SETTINGS"
 chown -R "$USERNAME:$USERNAME" "$MICRO_DIR"
 
+# ========= MC (MIDNIGHT COMMANDER) =========
+# Set the modarin256root skin for the main user and for /etc/skel so that
+# any future user created by add-sshuser inherits the same theme.
+log "Configuring mc theme"
+
+MC_DIR="$HOME_DIR/.config/mc"
+SKEL_MC_DIR="/etc/skel/.config/mc"
+
+mkdir -p "$MC_DIR" "$SKEL_MC_DIR"
+
+fetch "$REPO_RAW/mc-ini" "$MC_DIR/ini"
+fetch "$REPO_RAW/mc-ini" "$SKEL_MC_DIR/ini"
+
+chown -R "$USERNAME:$USERNAME" "$MC_DIR"
+
 # ========= HOSTNAME =========
 # Only touch the hostname when explicitly asked. Avoids every server
 # in a fleet ending up named "debian".
