@@ -177,6 +177,9 @@ esac
 # user's environment (they were only needed to build PS1 above).
 unset RESET WHITE_FG USERHOST_BG USERHOST_FG PATH_BG PATH_FG PROMPT_COLOR
 
+# Display MOTD once per login (login shells only, skip on SSH where sshd prints it)
+shopt -q login_shell && [ -z "$SSH_CLIENT" ] && [ -x /etc/update-motd.d/01-status ] && /etc/update-motd.d/01-status
+
 # -----------------------------
 # Aliases
 # -----------------------------
@@ -289,5 +292,3 @@ if command -v fzf >/dev/null 2>&1; then
     fi
 fi
 
-# Display MOTD on shell launch (works on all systems, not just those with PAM)
-[ -x /etc/update-motd.d/01-status ] && /etc/update-motd.d/01-status

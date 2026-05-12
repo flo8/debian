@@ -111,6 +111,15 @@ grep -qxF "$BASHRC_SOURCE_LINE" "$HOME_DIR/.bashrc" 2>/dev/null || echo "$BASHRC
 chown -R "$USERNAME:$USERNAME" "$BASH_CONFIG_DIR" "$HOME_DIR/.bashrc"
 echo "✔ bashrc installed"
 
+# ========= BASH_PROFILE =========
+log "Installing bash_profile"
+
+# ~/.bash_profile is for login shells — just sources ~/.bashrc.
+# All config goes in bashrc (the rule of thumb to avoid "works in one terminal but not another" issues).
+fetch "$REPO_RAW/bash_profile" "$HOME_DIR/.bash_profile"
+chown "$USERNAME:$USERNAME" "$HOME_DIR/.bash_profile"
+echo "✔ bash_profile installed"
+
 # ========= INPUTRC =========
 log "Installing inputrc"
 
