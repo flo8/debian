@@ -105,6 +105,21 @@ mkdir -p "$BASH_CONFIG_DIR"
 # Get our remote bashrc
 fetch "$REPO_RAW/bashrc" "$BASH_CONFIG_DIR/bashrc"
 
+# Strip leftovers from older install.sh versions that wrote a botched heredoc into
+# ~/.bashrc — pattern:
+#   # Display MOTD
+#   [ -x /etc/update-motd.d/01-status ] && /etc/update-motd.d/01-status
+#   EOF
+# All MOTD printing is now handled inside ~/.config/bash/bashrc, so these lines are
+# redundant at best and cause "EOF: command not found" at worst.
+if [ -f "$HOME_DIR/.bashrc" ]; then
+  sed -i \
+    -e '/^[[:space:]]*# Display MOTD[[:space:]]*$/d' \
+    -e '/^[[:space:]]*\[ -x \/etc\/update-motd\.d\/01-status \] && \/etc\/update-motd\.d\/01-status[[:space:]]*$/d' \
+    -e '/^[[:space:]]*EOF[[:space:]]*$/d' \
+    "$HOME_DIR/.bashrc"
+fi
+
 BASHRC_SOURCE_LINE="[ -f \"\$HOME/.config/bash/bashrc\" ] && . \"\$HOME/.config/bash/bashrc\""
 grep -qxF "$BASHRC_SOURCE_LINE" "$HOME_DIR/.bashrc" 2>/dev/null || echo "$BASHRC_SOURCE_LINE" >> "$HOME_DIR/.bashrc"
 

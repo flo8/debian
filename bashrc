@@ -177,8 +177,15 @@ esac
 # user's environment (they were only needed to build PS1 above).
 unset RESET WHITE_FG USERHOST_BG USERHOST_FG PATH_BG PATH_FG PROMPT_COLOR
 
-# Display MOTD once per login (login shells only, skip on SSH where sshd prints it)
-shopt -q login_shell && [ -z "$SSH_CLIENT" ] && [ -x /etc/update-motd.d/01-status ] && /etc/update-motd.d/01-status
+# Display MOTD as a fallback for systems where nothing else prints it.
+#   - skip on SSH         → sshd's PAM motd already printed it
+#   - skip when /run/motd.dynamic exists → pam_motd already printed it (Debian/Ubuntu/WSL)
+#   - login shells only   → we don't want it on every `bash` subshell
+# This way `01-status` runs exactly once on bare systems without PAM motd, and zero
+# extra times on the common case where PAM has it covered.
+if shopt -q login_shell && [ -z "$SSH_CLIENT" ] && [ ! -e /run/motd.dynamic ] && [ -x /etc/update-motd.d/01-status ]; then
+    /etc/update-motd.d/01-status
+fi
 
 # -----------------------------
 # Aliases
