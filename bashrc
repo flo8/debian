@@ -268,7 +268,7 @@ fi
 #   cd **<TAB>
 #   kill -9 <TAB>
 #
-# Debian 13 ships fzf 0.62, which supports `fzf --bash` (single-command setup
+# Debian 13 ships fzf 0.60.3, which supports `fzf --bash` (single-command setup
 # covering both key bindings and completion). Prefer it: avoids matching
 # per-file paths that drift between Debian releases (e.g. the completion file
 # moved from /usr/share/bash-completion/completions/fzf to

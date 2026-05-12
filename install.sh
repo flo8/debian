@@ -240,7 +240,7 @@ fi
 log "Installing MOTD..."
 truncate -s 0 /etc/motd
 mkdir -p /etc/update-motd.d
-fetch "$REPO_RAW/server-motd" "/etc/update-motd.d/01-status"
+fetch "$REPO_RAW/motd" "/etc/update-motd.d/01-status"
 chmod +x /etc/update-motd.d/01-status
 
 # ========= BULLETPROOF OWNERSHIP =========
