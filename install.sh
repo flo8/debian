@@ -182,6 +182,7 @@ X11Forwarding no
 ClientAliveInterval 300
 ClientAliveCountMax 2
 AllowGroups sshusers
+PrintMotd yes
 EOF
 
 # sshd -t validates the full config (main file + includes), so we must place

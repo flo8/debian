@@ -288,3 +288,6 @@ if command -v fzf >/dev/null 2>&1; then
         [ -f /usr/share/bash-completion/completions/fzf ]    && . /usr/share/bash-completion/completions/fzf
     fi
 fi
+
+# Display MOTD on shell launch (works on all systems, not just those with PAM)
+[ -x /etc/update-motd.d/01-status ] && /etc/update-motd.d/01-status
