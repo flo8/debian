@@ -11,7 +11,9 @@ PUR=$'\033[0;35m'
 GRN=$'\033[0;32m'
 YLW=$'\033[0;33m'
 CYN=$'\033[0;36m'
+BLU=$'\033[0;34m'
 RED=$'\033[0;31m'
+DIM=$'\033[2;37m'
 RST=$'\033[0m'
 
 # VARIABLES
@@ -44,27 +46,26 @@ disk_bar() {
 }
 
 # One-line header in place of the old multi-row ASCII banner.
-# Version mirrors the one printed in install.sh — bump both together.
-printf '%s═══ AIR360 config 1.1.3 ═══%s\n' "$PUR" "$RST"
+printf '%s═══ Welcome to Debian13 ═══%s\n' "$DIM" "$RST"
 
 # Left column: host + system stats. No separator lines now — the box draws them.
 LEFT=(
-  "${PUR}▣ $HOST${RST}"
-  "${YLW}uptime${RST} : $UPTIME"
-  "${YLW}load${RST}   : $LOAD"
-  "${YLW}ram${RST}    : ${GRN}$MEM${RST}"
-  "${YLW}disk${RST}   : ${GRN}$DISK${RST} $(disk_bar $DISK_PCT)"
-  "${YLW}ip${RST}     : ${GRN}$IP${RST}"
+  "${YLW}▣ $HOST${RST}"
+  "${BLU}uptime${RST} : ${DIM}$UPTIME${RST}"
+  "${BLU}load${RST}   : ${DIM}$LOAD${RST}"
+  "${BLU}ram${RST}    : ${DIM}$MEM${RST}"
+  "${BLU}disk${RST}   : ${DIM}$DISK${RST} $(disk_bar $DISK_PCT)"
+  "${BLU}ip${RST}     : ${DIM}$IP${RST}"
 )
 
 # Right column: tips / shortcut cheatsheet.
 RIGHT=(
   "${YLW}tips${RST}"
-  "${CYN}ctrl+r${RST}  history search"
-  "${CYN}ctrl+x ➜ ctrl+e${RST}  edit current command"
-  "${CYN}editors${RST} vim · hx · micro"
-  "${CYN}admin${RST} ufw, tmux, tree, mc, s3cmd, fzf, bat"
-  "${CYN}debug${RST} htop strace ncdu duf myip iftop perf dstat"
+  "${PUR}ctrl+r${RST}  ${DIM}history search${RST}"
+  "${PUR}ctrl+x ➜ ctrl+e${RST}  ${DIM}edit current command${RST}"
+  "${PUR}editors${RST} ${DIM}vim · hx · micro${RST}"
+  "${PUR}admin${RST} ${DIM}ufw, tmux, tree, mc, s3cmd, fzf, bat${RST}"
+  "${PUR}debug${RST} ${DIM}htop strace ncdu duf myip iftop perf dstat${RST}"
 )
 
 # Strip ANSI escape sequences and return the visible character count.
