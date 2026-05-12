@@ -24,6 +24,22 @@ MEM="$(free -h | awk '/Mem:/ {print $3 "/" $2}')"
 DISK="$(df -h / | awk 'NR==2 {print $3 "/" $2}')"
 DISK_PCT="$(df / | awk 'NR==2 {print $5}' | tr -d '%')"
 IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+KERNEL="$(uname -r)"
+
+# Last apt update — derived from the pkgcache.bin mtime, refreshed by `apt update`.
+# Stat is instant; we render as "Nd ago" so the line stays short.
+APT_TS="$(stat -c %Y /var/cache/apt/pkgcache.bin 2>/dev/null || echo 0)"
+if (( APT_TS > 0 )); then
+  APT_AGE_DAYS=$(( ($(date +%s) - APT_TS) / 86400 ))
+  APT_LAST="${APT_AGE_DAYS}d ago"
+else
+  APT_LAST="unknown"
+fi
+
+# Reboot required marker — populated by unattended-upgrades / needrestart when
+# a kernel or libc update lands. Absent file = no reboot needed, so silent.
+REBOOT_REQUIRED=""
+[ -f /var/run/reboot-required ] && REBOOT_REQUIRED="yes"
 
 # DISK BAR
 disk_bar() {
@@ -46,7 +62,7 @@ disk_bar() {
 }
 
 # One-line header in place of the old multi-row ASCII banner.
-printf '%s═══ Welcome to Debian13 ═══%s\n' "$PUR" "$RST"
+printf '%s═══ Welcome to Debian13 | Kernel %s ═══%s\n' "$PUR" "$KERNEL" "$RST"
 
 # Left column: host + system stats. No separator lines now — the box draws them.
 LEFT=(
@@ -56,12 +72,19 @@ LEFT=(
   "${PUR}ram${RST}    : ${DIM}$MEM${RST}"
   "${PUR}disk${RST}   : ${DIM}$DISK${RST} $(disk_bar $DISK_PCT)"
   "${PUR}ip${RST}     : ${DIM}$IP${RST}"
+  "${PUR}apt${RST}    : ${DIM}$APT_LAST${RST}"
 )
+
+# Conditionally append a loud reboot-required row so it stands out.
+if [ -n "$REBOOT_REQUIRED" ]; then
+  LEFT+=("${RED}● reboot required${RST}")
+fi
 
 # Right column: tips / shortcut cheatsheet.
 RIGHT=(
   "${DIM}tips${RST}"
   "${PUR}ctrl+r${RST}  ${DIM}history search${RST}"
+  "${PUR}ctrl+t${RST}  ${DIM}find file (fzf)${RST}"
   "${PUR}ctrl+x ➜ ctrl+e${RST}  ${DIM}edit current command${RST}"
   "${PUR}editors${RST} ${DIM}vim · hx · micro${RST}"
   "${PUR}admin${RST} ${DIM}ufw, tmux, tree, mc, s3cmd, fzf, bat${RST}"
