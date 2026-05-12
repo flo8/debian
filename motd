@@ -1,11 +1,19 @@
 #!/bin/bash
-# colors
-PUR='\033[0;35m'
-GRN='\033[0;32m'
-YLW='\033[0;33m'
-CYN='\033[0;36m'
-RED='\033[0;31m'
-RST='\033[0m'
+
+# Side-by-side box rendering uses bash extglob for the ANSI-strip pattern
+# in visible_len, and a UTF-8 locale so ${#var} counts characters (not bytes).
+shopt -s extglob
+
+# colors — use $'...' so these are real ESC bytes, not literal "\033" text.
+# That way every string we build (including command-substitution output from
+# disk_bar) has the same form, and visible_len only needs to strip one shape.
+PUR=$'\033[0;35m'
+GRN=$'\033[0;32m'
+YLW=$'\033[0;33m'
+CYN=$'\033[0;36m'
+RED=$'\033[0;31m'
+RST=$'\033[0m'
+
 # VARIABLES
 HOST="$(hostname)"
 UPTIME="$(uptime -p | sed 's/up //')"
@@ -30,37 +38,103 @@ disk_bar() {
   (( pct >= 80 )) && color=$YLW
   (( pct >= 90 )) && color=$RED
 
-  echo -e "${color}${bar} ${pct}%${RST}"
+  # printf (not echo -e) so the output keeps the same form as the rest of
+  # the strings we build — $color/$RST already hold real ESC bytes.
+  printf '%s%s %s%%%s' "$color" "$bar" "$pct" "$RST"
 }
 
-# 3D-ASCII font on https://patorjk.com/software/taag/#p=testall&f=Bulbhead&t=air360&x=none&v=4&h=4&w=80&we=false
-echo -e "${PUR}"
-cat << "EOF"
- ________  ___  ________  ________  ________  ________
-|\   __  \|\  \|\   __  \|\_____  \|\   ____\|\   __  \
-\ \  \|\  \ \  \ \  \|\  \|____|\ /\ \  \___|\ \  \|\  \
- \ \   __  \ \  \ \   _  _\    \|\  \ \  \____\ \  \\\  \
-  \ \  \ \  \ \  \ \  \\  \|  __\_\  \ \  ___  \ \  \\\  \
-   \ \__\ \__\ \__\ \__\\ _\ |\_______\ \_______\ \_______\
-    \|__|\|__|\|__|\|__|\|__|\|_______|\|_______|\|_______|
-EOF
-echo -e "${RST}"
+# One-line header in place of the old multi-row ASCII banner.
+# Version mirrors the one printed in install.sh — bump both together.
+printf '%s═══ AIR360 config 1.1.3 ═══%s\n' "$PUR" "$RST"
 
-# PRINT
-echo -e "${PUR}▣ $HOST${RST}"
-echo -e "${PUR}────────────────────────${RST}"
-echo -e "${YLW}uptime${RST} : $UPTIME"
-echo -e "${YLW}load${RST}   : $LOAD"
-echo -e "${YLW}ram${RST}    : ${GRN}$MEM${RST}"
-echo -e "${YLW}disk${RST}   : ${GRN}$DISK${RST} $(disk_bar $DISK_PCT)"
-echo -e "${YLW}ip${RST}     : ${GRN}$IP${RST}"
-echo -e "${PUR}────────────────────────${RST}"
-echo -e "${YLW}tips${RST}"
-echo -e "  ${CYN}ctrl+r${RST}  history search"
-echo -e "  ${CYN}ctrl+x ➜ ctrl+e${RST}  edit current command"
-echo -e "  ${CYN}editors${RST} vim · hx · micro"
-echo -e "  ${CYN}shell${RST}   bash"
-echo -e "  ${CYN}admin${RST} ufw, tmux, tree, mc, s3cmd, fzf, bat"
-echo -e "  ${CYN}debug${RST} htop strace ncdu duf myip iftop perf dstat"
-echo -e "${PUR}────────────────────────${RST}"
+# Left column: host + system stats. No separator lines now — the box draws them.
+LEFT=(
+  "${PUR}▣ $HOST${RST}"
+  "${YLW}uptime${RST} : $UPTIME"
+  "${YLW}load${RST}   : $LOAD"
+  "${YLW}ram${RST}    : ${GRN}$MEM${RST}"
+  "${YLW}disk${RST}   : ${GRN}$DISK${RST} $(disk_bar $DISK_PCT)"
+  "${YLW}ip${RST}     : ${GRN}$IP${RST}"
+)
+
+# Right column: tips / shortcut cheatsheet.
+RIGHT=(
+  "${YLW}tips${RST}"
+  "${CYN}ctrl+r${RST}  history search"
+  "${CYN}ctrl+x ➜ ctrl+e${RST}  edit current command"
+  "${CYN}editors${RST} vim · hx · micro"
+  "${CYN}admin${RST} ufw, tmux, tree, mc, s3cmd, fzf, bat"
+  "${CYN}debug${RST} htop strace ncdu duf myip iftop perf dstat"
+)
+
+# Strip ANSI escape sequences and return the visible character count.
+# Pattern uses extglob *([0-9;]) to match any "[0;35m"-style payload.
+visible_len() {
+  local stripped="${1//$'\033'\[*([0-9;])m/}"
+  echo "${#stripped}"
+}
+
+# Compute column widths from the widest visible line in each side.
+left_max=0
+right_max=0
+for line in "${LEFT[@]}"; do
+  w=$(visible_len "$line")
+  (( w > left_max )) && left_max=$w
+done
+for line in "${RIGHT[@]}"; do
+  w=$(visible_len "$line")
+  (( w > right_max )) && right_max=$w
+done
+
+# Repeat a single character N times — used to build horizontal borders.
+repeat() {
+  local char=$1
+  local count=$2
+  local i out=""
+  for ((i=0; i<count; i++)); do out+="$char"; done
+  printf '%s' "$out"
+}
+
+# Build a horizontal border: <left><═...═><mid><═...═><right>.
+# The +2 on each side accounts for the single-space padding inside each cell.
+build_border() {
+  local lc=$1 mc=$2 rc=$3
+  printf '%s%s%s%s%s\n' "$lc" "$(repeat '═' $((left_max+2)))" "$mc" "$(repeat '═' $((right_max+2)))" "$rc"
+}
+
+top_border=$(build_border '╔' '╤' '╗')
+bot_border=$(build_border '╚' '╧' '╝')
+
+# Top border (purple to match the theme).
+printf '%s%s%s\n' "$PUR" "$top_border" "$RST"
+
+# Print each row inside the box: ║ <left, padded> │ <right, padded> ║.
+n_left=${#LEFT[@]}
+n_right=${#RIGHT[@]}
+n_max=$(( n_left > n_right ? n_left : n_right ))
+
+for (( i = 0; i < n_max; i++ )); do
+
+  # Missing rows on either side just become empty strings.
+  lpart="${LEFT[i]:-}"
+  rpart="${RIGHT[i]:-}"
+
+  # Pad each cell out to its column width so the right border lines up.
+  lw=$(visible_len "$lpart")
+  rw=$(visible_len "$rpart")
+
+  lpad=""
+  rpad=""
+  (( left_max  - lw > 0 )) && lpad=$(printf '%*s' "$((left_max  - lw))" '')
+  (( right_max - rw > 0 )) && rpad=$(printf '%*s' "$((right_max - rw))" '')
+
+  printf '%s║%s %s%s %s│%s %s%s %s║%s\n' \
+    "$PUR" "$RST" "$lpart" "$lpad" \
+    "$PUR" "$RST" "$rpart" "$rpad" \
+    "$PUR" "$RST"
+done
+
+# Bottom border.
+printf '%s%s%s\n' "$PUR" "$bot_border" "$RST"
+
 echo ""

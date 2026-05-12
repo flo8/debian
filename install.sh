@@ -17,6 +17,7 @@ set -euo pipefail
 # ============================================================================
 
 # ========= CONFIG =========
+VERSION="1.1.4"
 USERNAME="flo"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
 REPO_RAW="https://raw.githubusercontent.com/flo8/debian/main"
@@ -45,8 +46,9 @@ require_root
 export DEBIAN_FRONTEND=noninteractive
 
 # ========= BOOT =========
+# %-11s keeps the right border aligned for any version up to 11 chars long.
 echo -e "\n\033[1;35m╔══════════════════════════════════════╗\033[0m"
-echo -e "\033[1;35m║   INITIALIZING... version 1.1.3      ║\033[0m"
+printf '\033[1;35m║   INITIALIZING... version %-11s║\033[0m\n' "$VERSION"
 echo -e "\033[1;35m╚══════════════════════════════════════╝\033[0m"
 
 # ========= SYSTEM =========
@@ -267,6 +269,11 @@ log "Installing MOTD..."
 truncate -s 0 /etc/motd
 mkdir -p /etc/update-motd.d
 fetch "$REPO_RAW/motd" "/etc/update-motd.d/01-status"
+
+# Bake the install-time version into the motd banner so we don't have to
+# keep the literal in two places in the repo.
+sed -i "s|AIR360 config [^ ]*|AIR360 config $VERSION|" /etc/update-motd.d/01-status
+
 chmod +x /etc/update-motd.d/01-status
 
 # ========= BULLETPROOF OWNERSHIP =========
