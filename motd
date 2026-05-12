@@ -46,21 +46,21 @@ disk_bar() {
 }
 
 # One-line header in place of the old multi-row ASCII banner.
-printf '%s═══ Welcome to Debian13 ═══%s\n' "$DIM" "$RST"
+printf '%s═══ Welcome to Debian13 ═══%s\n' "$PUR" "$RST"
 
 # Left column: host + system stats. No separator lines now — the box draws them.
 LEFT=(
-  "${YLW}▣ $HOST${RST}"
-  "${BLU}uptime${RST} : ${DIM}$UPTIME${RST}"
-  "${BLU}load${RST}   : ${DIM}$LOAD${RST}"
-  "${BLU}ram${RST}    : ${DIM}$MEM${RST}"
-  "${BLU}disk${RST}   : ${DIM}$DISK${RST} $(disk_bar $DISK_PCT)"
-  "${BLU}ip${RST}     : ${DIM}$IP${RST}"
+  "${BLU}▣ $HOST${RST}"
+  "${PUR}uptime${RST} : ${DIM}$UPTIME${RST}"
+  "${PUR}load${RST}   : ${DIM}$LOAD${RST}"
+  "${PUR}ram${RST}    : ${DIM}$MEM${RST}"
+  "${PUR}disk${RST}   : ${DIM}$DISK${RST} $(disk_bar $DISK_PCT)"
+  "${PUR}ip${RST}     : ${DIM}$IP${RST}"
 )
 
 # Right column: tips / shortcut cheatsheet.
 RIGHT=(
-  "${YLW}tips${RST}"
+  "${DIM}tips${RST}"
   "${PUR}ctrl+r${RST}  ${DIM}history search${RST}"
   "${PUR}ctrl+x ➜ ctrl+e${RST}  ${DIM}edit current command${RST}"
   "${PUR}editors${RST} ${DIM}vim · hx · micro${RST}"
