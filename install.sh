@@ -58,7 +58,8 @@ log "Installing base packages"
 apt-get install -y \
   sudo vim micro tmux rsync cron htop rsyslog git lsof curl wget \
   tree mc fzf bat strace ufw unzip s3cmd jq openssh-server sysstat \
-  bash-completion hx ncdu linux-cpupower linux-perf dnsutils duf iftop dstat
+  bash-completion hx ncdu linux-cpupower linux-perf dnsutils duf iftop dstat \
+  systemd-timesyncd
 
 # ========= BAT SYMLINK =========
 log "Creating bat symlink for fzf"
@@ -226,7 +227,7 @@ systemctl restart ssh || systemctl restart sshd
 # ========= SERVICES =========
 log "Enabling services"
 systemctl enable --now cron
-timedatectl set-ntp true
+timedatectl set-ntp true 2>/dev/null || log "NTP not available, skipping"
 
 # ========= TMUX =========
 log "Installing tmux config"
