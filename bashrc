@@ -162,7 +162,7 @@ __git_info() {
 # Two-line prompt:
 #   line 1: user@host  /path  (git branch)
 #   line 2: $
-export PS1="${USERHOST_BG}${USERHOST_FG}\u@\h ${RESET}${PATH_BG}${PATH_FG}\w ${RESET}\$(__git_info)\n${PROMPT_COLOR}\\$ ${RESET}"
+export PS1="${USERHOST_BG}${USERHOST_FG}\u@\h ${RESET}${PATH_BG}${PATH_FG} \w ${RESET}\$(__git_info)\n${PROMPT_COLOR}\\$ ${RESET}"
 
 # On xterm-like terminals, also set the window/tab title to "user@host: cwd".
 # The \e]0;...\a sequence is wrapped in \[..\] so bash doesn't count it
