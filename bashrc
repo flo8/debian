@@ -63,7 +63,7 @@ export COLORTERM=truecolor
 # Minimal LS_COLORS — no dircolors dependency.
 export LS_COLORS="di=1;34:ln=36:so=35:pi=33:ex=1;32"
 
-alias ls='ls --color=auto'
+alias ls='ls -lah --group-directories-first --color=auto'
 alias grep='grep --color=auto'
 
 # -----------------------------
@@ -204,6 +204,9 @@ alias myip='ip=$(dig +short myip.opendns.com @resolver1.opendns.com | head -n1);
 if command -v batcat >/dev/null 2>&1; then
     alias bat='batcat --pager=never'
 fi
+
+# Short alias for lazygit TUI
+alias lg='lazygit'
 
 # -----------------------------
 # Editor
