@@ -60,8 +60,12 @@ shopt -s globstar
 # -----------------------------
 export COLORTERM=truecolor
 
-# Minimal LS_COLORS — no dircolors dependency.
-export LS_COLORS="di=1;34:ln=36:so=35:pi=33:ex=1;32"
+# LS_COLORS — no dircolors dependency.
+# di  = directories (bold magenta)
+# ln  = symlinks (bold cyan)
+# ex  = executables (pink 256-color)
+# Plus per-extension highlights for common dev files.
+export LS_COLORS="di=1;35:ln=1;36:ex=38;5;213:*.go=1;34:*.mod=1;33:*.sum=1;33:*.json=1;96:*.md=1;95:*.txt=1;37:*.sh=1;93:*.yaml=1;94:*.yml=1;94:*.bin=38;5;213:*.out=38;5;213:*.log=1;90"
 
 alias ls='ls -lah --group-directories-first --color=auto'
 alias grep='grep --color=auto'
