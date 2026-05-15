@@ -58,10 +58,19 @@ apt-get dist-upgrade -y
 
 log "Installing base packages"
 apt-get install -y \
-  sudo vim micro tmux rsync cron htop rsyslog git lsof curl wget \
-  tree mc fzf bat strace ufw unzip s3cmd jq openssh-server sysstat \
-  bash-completion hx ncdu linux-cpupower linux-perf dnsutils duf iftop dstat \
-  systemd-timesyncd
+  `# Core shell / system` \
+  sudo vim micro hx tmux bash-completion cron rsyslog systemd-timesyncd \
+  `# File / archive utilities` \
+  rsync tree mc fzf bat unzip s3cmd jq \
+  `# Version control & transfer` \
+  git curl wget \
+  `# System observability` \
+  htop lsof strace sysstat ncdu duf dstat linux-cpupower linux-perf \
+  `# Network troubleshooting` \
+  dnsutils traceroute mtr-tiny tcpdump netcat-openbsd nmap whois \
+  iperf3 ipcalc arping iftop \
+  `# Security / remote access` \
+  ufw openssh-server
 
 # ========= BAT SYMLINK =========
 log "Creating bat symlink for fzf"
