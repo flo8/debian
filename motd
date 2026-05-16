@@ -80,13 +80,13 @@ printf '%s═══ Welcome to %s | Kernel %s ═══%s\n' "$PUR" "$OS_LABEL" 
 
 # Left column: host + system stats. No separator lines now — the box draws them.
 LEFT=(
-  "${BLU}# $HOST${RST}"
-  "${PUR}uptime${RST} : ${DIM}$UPTIME${RST}"
-  "${PUR}load${RST}   : ${DIM}$LOAD${RST}"
-  "${PUR}ram${RST}    : ${DIM}$MEM${RST}"
-  "${PUR}disk${RST}   : ${DIM}$DISK${RST} $(disk_bar $DISK_PCT)"
-  "${PUR}ip${RST}     : ${DIM}$IP${RST}"
-  "${PUR}apt${RST}    : ${DIM}$APT_LAST${RST}"
+  "${PUR}machine${RST} : ${BLU}$HOST${RST}"
+  "${PUR}uptime${RST}  : ${DIM}$UPTIME${RST}"
+  "${PUR}load${RST}    : ${DIM}$LOAD${RST}"
+  "${PUR}ram${RST}     : ${DIM}$MEM${RST}"
+  "${PUR}disk${RST}    : ${DIM}$DISK${RST} $(disk_bar $DISK_PCT)"
+  "${PUR}ip${RST}      : ${DIM}$IP${RST}"
+  "${PUR}apt${RST}     : ${DIM}$APT_LAST${RST}"
 )
 
 # Conditionally append a loud reboot-required row so it stands out.
@@ -100,9 +100,10 @@ RIGHT=(
   "${PUR}ctrl+r${RST}  ${DIM}history search${RST}"
   "${PUR}ctrl+t${RST}  ${DIM}find file (fzf)${RST}"
   "${PUR}ctrl+x > ctrl+e${RST}  ${DIM}edit current command${RST}"
-  "${PUR}editors${RST} ${DIM}vim · hx · micro${RST}"
-  "${PUR}admin${RST} ${DIM}ufw, tmux, tree, mc, s3cmd, fzf, bat${RST}"
-  "${PUR}debug${RST} ${DIM}htop strace ncdu duf myip iftop perf dstat${RST}"
+  "${PUR}editors${RST} ${DIM}vim | hx | micro${RST}"
+  "${PUR}admin${RST}   ${DIM}tmux | tree | mc | fzf | bat${RST}"
+  "${PUR}network${RST} ${DIM}ufw | myip | iftop | s3cmd${RST}"
+  "${PUR}system${RST}  ${DIM}htop | strace | ncdu | duf | perf | dstat${RST}"
 )
 
 # Strip ANSI escape sequences and return the visible character count.
