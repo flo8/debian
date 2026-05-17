@@ -17,7 +17,7 @@ set -euo pipefail
 # ============================================================================
 
 # ========= CONFIG =========
-VERSION="1.1.6"
+VERSION="1.1.7"
 USERNAME="flo"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
 REPO_RAW="https://raw.githubusercontent.com/flo8/debian/main"
@@ -61,7 +61,7 @@ apt-get install -y \
   `# Core shell / system` \
   sudo vim micro hx tmux bash-completion cron rsyslog systemd-timesyncd \
   `# File / archive utilities` \
-  rsync tree mc fzf bat unzip s3cmd jq \
+  rsync tree mc fzf bat unzip s3cmd jq sqlite3 \
   `# Version control & transfer` \
   git curl wget \
   `# System observability` \
