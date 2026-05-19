@@ -17,7 +17,7 @@ set -euo pipefail
 # ============================================================================
 
 # ========= CONFIG =========
-VERSION="1.1.8"
+VERSION="1.1.10"
 USERNAME="flo"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
 REPO_RAW="https://raw.githubusercontent.com/flo8/debian/main"
@@ -63,9 +63,9 @@ apt-get install -y \
   `# File / archive utilities` \
   rsync tree mc fzf bat unzip s3cmd jq sqlite3 \
   `# Version control & transfer` \
-  git curl wget \
+  git lazygit curl wget \
   `# System observability` \
-  htop lsof strace sysstat ncdu duf dstat linux-cpupower linux-perf \
+  htop btop lsof strace sysstat ncdu duf dstat linux-cpupower linux-perf \
   `# Network troubleshooting` \
   dnsutils traceroute mtr-tiny tcpdump netcat-openbsd nmap whois \
   iperf3 ipcalc arping iftop \
