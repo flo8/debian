@@ -21,6 +21,7 @@ HOST="$(hostname)"
 UPTIME="$(uptime -p | sed 's/up //')"
 LOAD="$(awk '{print $1, $2, $3}' /proc/loadavg)"
 MEM="$(free -h | awk '/Mem:/ {print $3 "/" $2}')"
+MEM_PCT="$(free | awk '/Mem:/ {printf "%.0f", $3/$2 * 100}')"
 DISK="$(df -h / | awk 'NR==2 {print $3 "/" $2}')"
 DISK_PCT="$(df / | awk 'NR==2 {print $5}' | tr -d '%')"
 IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
@@ -53,16 +54,20 @@ fi
 REBOOT_REQUIRED=""
 [ -f /var/run/reboot-required ] && REBOOT_REQUIRED="yes"
 
-# DISK BAR
-disk_bar() {
+# USAGE BAR — generic % bar reused by disk and RAM rows.
+# Second arg is the "empty" shade char: pass ░ (light, CP437 176) or
+# ▒ (medium, CP437 177) so two adjacent bars are easy to tell apart.
+usage_bar() {
   local pct=$1
+  local empty_char=${2:-░}
   local width=12
   local filled=$(( pct * width / 100 ))
   local empty=$(( width - filled ))
-  local bar="["
-  for ((i=0; i<filled; i++)); do bar+="#"; done
-  for ((i=0; i<empty; i++)); do bar+="."; done
-  bar+="]"
+  # MSDOS-style bar: █ (full block, CP437 219) for used.
+  # Evokes SCANDISK/DEFRAG.
+  local bar=""
+  for ((i=0; i<filled; i++)); do bar+="█"; done
+  for ((i=0; i<empty; i++)); do bar+="$empty_char"; done
 
   # Stay dim by default — only colorize when usage gets close to full,
   # so the bar doesn't shout for attention when nothing's wrong.
@@ -83,8 +88,8 @@ LEFT=(
   "${PUR}machine${RST} : ${BLU}$HOST${RST}"
   "${PUR}uptime${RST}  : ${DIM}$UPTIME${RST}"
   "${PUR}load${RST}    : ${DIM}$LOAD${RST}"
-  "${PUR}ram${RST}     : ${DIM}$MEM${RST}"
-  "${PUR}disk${RST}    : ${DIM}$DISK${RST} $(disk_bar $DISK_PCT)"
+  "${PUR}ram${RST}     : $(usage_bar $MEM_PCT ░) ${DIM}($MEM)${RST}"
+  "${PUR}disk${RST}    : $(usage_bar $DISK_PCT ▒) ${DIM}($DISK)${RST}"
   "${PUR}ip${RST}      : ${DIM}$IP${RST}"
   "${PUR}apt${RST}     : ${DIM}$APT_LAST${RST}"
 )
