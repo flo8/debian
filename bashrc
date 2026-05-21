@@ -232,28 +232,11 @@ fi
 # -----------------------------
 # tmux
 # -----------------------------
-# Calling `tmux` with no args reattaches to the "main" session if it's
-# already running, otherwise creates it. Sessions live in the tmux server
-# and survive SSH disconnects until the machine reboots or the server is
-# killed — no disk state needed.
-#
-# Any explicit subcommand (e.g. `tmux ls`, `tmux kill-server`) bypasses
-# this wrapper and runs unmodified via `command tmux`.
-tmux() {
-
-    # Forward any explicit args straight to the real tmux
-    if [ $# -gt 0 ]; then
-        command tmux "$@"
-        return
-    fi
-
-    # No args — attach to "main" if it exists, otherwise create it
-    if command tmux has-session -t main 2>/dev/null; then
-        command tmux attach -t main
-    else
-        command tmux new-session -s main
-    fi
-}
+# Short alias: attach to session "flo" or create it.
+# -A makes new-session behave like attach when the target session already exists.
+# Sessions live in the tmux server and survive SSH disconnects until the
+# machine reboots or the server is killed — no disk state needed.
+alias tm='tmux new-session -A -s flo'
 
 # -----------------------------
 # User-local aliases
