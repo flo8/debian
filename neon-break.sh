@@ -9,52 +9,27 @@ client=$(tmux list-clients -F '#{client_activity} #{client_name}' 2>/dev/null \
 [ -z "$client" ] && exit 0
 
 tmux display-popup \
-  -c "$client" \
-  -x 'R' \
-  -y 1 \
-  -w 50 \
-  -h 14 \
-  -E '
-bash -c "
-
+    -c "$client" \
+    -E \
+    -x R \
+    -y 0 \
+    -w 36 \
+    -h 12 \
+    -b rounded \
+    -s "bg=#24116b,fg=#b084ff,border-fg=#8d63ff" \
+    -T "■ COMMODORE HEALTH OS" \
+    "bash -c '
+printf \"\033[48;2;36;17;107m\033[38;2;176;132;255m\"
 clear
-
-printf \"\033[48;5;17m\"
-printf \"\033[38;5;213m\"
-
-cat <<EOF
-
-   ███████████████████████████████████
-
-        COMMODORE WELLNESS OS v1.0
-
-   ███████████████████████████████████
-
-EOF
-
-printf \"\033[38;5;51m\"
-
-cat <<EOF
-        ░▒▓█  N E O N   B R E A K  █▓▒░
-
-EOF
-
-printf \"\033[38;5;220m\"
-
-cat <<EOF
-    SYS64738: GO HYDRATE
-
-    > blink your eyes
-    > unclench shoulders
-    > breathe slowly
-
-EOF
-
-printf \"\033[38;5;201m\"
-printf \"    READY.\n\"
-
-printf \"\033[0m\"
-
-sleep 8
-"
-'
+echo
+echo \"  **** TAKE A BREAK ****\"
+echo
+echo \"  ░ DRINK WATER\"
+echo \"  ░ LOOK AWAY\"
+echo \"  ░ BREATHE\"
+echo
+for i in 10 9 8 7 6 5 4 3 2 1; do
+    printf \"\r  CLOSING IN %d...  \" \"\$i\"
+    sleep 1
+done
+'"
