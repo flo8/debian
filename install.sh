@@ -17,7 +17,7 @@ set -euo pipefail
 # ============================================================================
 
 # ========= CONFIG =========
-VERSION="1.1.11"
+VERSION="1.1.12"
 USERNAME="flo"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
 REPO_RAW="https://raw.githubusercontent.com/flo8/debian/main"
@@ -245,6 +245,13 @@ log "Installing tmux config"
 
 fetch "$REPO_RAW/.tmux.conf" "$HOME_DIR/.tmux.conf"
 chown "$USERNAME:$USERNAME" "$HOME_DIR/.tmux.conf"
+
+# Pomodoro break popup, launched by the break loop in .tmux.conf.
+log "Download neon-break script"
+
+fetch "$REPO_RAW/neon-break.sh" "/usr/local/bin/neon-break"
+chmod 0755 "/usr/local/bin/neon-break"
+chown root:root "/usr/local/bin/neon-break"
 
 # ========= MICRO =========
 log "Configuring micro"
