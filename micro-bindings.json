@@ -1,0 +1,23 @@
+{
+  "Alt-/": "lua:comment.comment",
+  "CtrlUnderscore": "lua:comment.comment",
+  "Ctrl-d": "SpawnMultiCursor",
+  "Ctrl-l": "SelectLine",
+  "Ctrl-Delete": "DeleteWordRight",
+  "Ctrl-Backspace": "DeleteWordLeft",
+  "Ctrl-Up": "MoveLinesUp",
+  "Ctrl-Down": "MoveLinesDown",
+  "Ctrl-Space": "Autocomplete",
+  "Ctrl-g": "command:goto",
+  "Ctrl-p": "command:open",
+  "Ctrl-f": "Find",
+  "Ctrl-a": "SelectAll",
+  "Ctrl-z": "Undo",
+  "Ctrl-y": "Redo",
+  "Ctrl-s": "Save",
+  "Ctrl-w": "Quit",
+  "Tab": "IndentSelection",
+  "Shift-Tab": "OutdentSelection",
+  "Ctrl-Alt-Up": "SpawnMultiCursorUp",
+  "Ctrl-Alt-Down": "SpawnMultiCursorDown"
+}

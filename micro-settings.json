@@ -1,3 +1,16 @@
 {
-  "ft:env": "sh"
+    "clipboard": "terminal",
+    "colorscheme": "flo",
+    "diffgutter": true,
+    "hlsearch": true,
+    "matchbracestyle": "highlight",
+    "mkparents": true,
+    "rmtrailingws": true,
+    "savecursor": true,
+    "saveundo": true,
+    "scrollbar": true,
+    "scrollmargin": 5,
+    "softwrap": true,
+    "tabstospaces": true,
+    "wordwrap": true
 }

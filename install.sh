@@ -17,7 +17,7 @@ set -euo pipefail
 # ============================================================================
 
 # ========= CONFIG =========
-VERSION="1.1.12"
+VERSION="1.1.13"
 USERNAME="flo"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
 REPO_RAW="https://raw.githubusercontent.com/flo8/debian/main"
@@ -254,14 +254,21 @@ chmod 0755 "/usr/local/bin/neon-break"
 chown root:root "/usr/local/bin/neon-break"
 
 # ========= MICRO =========
+# micro is installed via apt with the base packages above; here we just deploy
+# the version-controlled config.
 log "Configuring micro"
 
 MICRO_DIR="$HOME_DIR/.config/micro"
-MICRO_SETTINGS="$MICRO_DIR/settings.json"
+MICRO_COLORS_DIR="$MICRO_DIR/colorschemes"
 
-mkdir -p "$MICRO_DIR"
-# Fetch version-controlled config (recommended)
-fetch "$REPO_RAW/micro-settings.json" "$MICRO_SETTINGS"
+# colorschemes subdir holds the custom "flo" theme referenced by settings.json.
+mkdir -p "$MICRO_COLORS_DIR"
+
+# Fetch version-controlled config: editor settings, key bindings and theme.
+fetch "$REPO_RAW/micro-settings.json" "$MICRO_DIR/settings.json"
+fetch "$REPO_RAW/micro-bindings.json" "$MICRO_DIR/bindings.json"
+fetch "$REPO_RAW/micro-flo.micro" "$MICRO_COLORS_DIR/flo.micro"
+
 chown -R "$USERNAME:$USERNAME" "$MICRO_DIR"
 
 # ========= MC (MIDNIGHT COMMANDER) =========
