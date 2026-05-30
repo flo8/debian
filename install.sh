@@ -65,7 +65,7 @@ apt-get install -y \
   `# Version control & transfer` \
   git lazygit curl wget \
   `# System observability` \
-  htop btop lsof strace sysstat ncdu duf dstat linux-cpupower linux-perf \
+  htop btop lsof strace sysstat ncdu duf dstat linux-cpupower linux-perf valgrind \
   `# Network troubleshooting` \
   dnsutils traceroute mtr-tiny tcpdump netcat-openbsd nmap whois \
   iperf3 ipcalc arping iftop \
