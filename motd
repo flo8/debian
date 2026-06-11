@@ -4,6 +4,14 @@
 # in visible_len, and a UTF-8 locale so ${#var} counts characters (not bytes).
 shopt -s extglob
 
+# Force a UTF-8 locale so ${#var} in visible_len() counts characters, not bytes.
+# At login this script runs via pam_motd/update-motd.d in a stripped environment
+# where LANG is usually unset → locale falls back to C → ${#var} counts bytes →
+# the multibyte bar glyphs (█ ░ ▒, 3 bytes each) are over-counted and the box
+# right border misaligns. C.UTF-8 is always present on glibc (Debian 11+), needs
+# no locale-gen, and keeps numeric formatting predictable for the df/free math.
+export LC_ALL=C.UTF-8
+
 # colors — use $'...' so these are real ESC bytes, not literal "\033" text.
 # That way every string we build (including command-substitution output from
 # disk_bar) has the same form, and visible_len only needs to strip one shape.
