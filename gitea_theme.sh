@@ -17,10 +17,26 @@ NEW_LIGHT_1="#b48ae8"
 NEW_LIGHT_2="#9d6ed4"
 NEW_BARE="cba6f7"
 
-# Bare hex colors previously written into the theme (blue original + pink patch).
-# These catch any occurrence that is NOT a --color-primary* variable.
-OLD_BARE_BLUE="4183c4"
-OLD_BARE_PINK="[Ff][Ff]70[Bb]3"
+# Bare hex shades previously written into the theme, mapped to their Mauve
+# equivalent. These catch occurrences that are NOT --color-primary* variables
+# (the air360 theme also hardcodes the primary shades in a few other places).
+# Format: "old_hex new_hex" — old_hex is a case-insensitive regex, no leading #.
+declare -a BARE_MAP=(
+    # Original blue palette.
+    "4183c4 ${NEW_BARE}"
+    "548[Ff][Cc][Aa] d4b5f9"
+    "679[Cc][Dd]0 ddc4fb"
+    "7[Aa][Aa]8[Dd]6 e6d3fd"
+    "3876[Bb]3 b48ae8"
+    "31699[Ff] 9d6ed4"
+    # Earlier pink patch.
+    "[Ff][Ff]70[Bb]3 ${NEW_BARE}"
+    "[Ee]55[Ff]9[Ee] d4b5f9"
+    "[Cc][Cc]5490 ddc4fb"
+    "[Bb]24[Aa]7[Ee] e6d3fd"
+    "[Ff][Ff]85[Bb][Ff] b48ae8"
+    "[Ff][Ff]9[Bb][Cc][Bb] 9d6ed4"
+)
 
 # ── Root check ───────────────────────────────────────────────────────────────
 if [ "$EUID" -ne 0 ]; then
@@ -53,10 +69,17 @@ docker exec "$CONTAINER" sed -i \
     "$THEME_FILE"
 
 # Catch any remaining bare occurrences (original blue + earlier pink patch).
-docker exec "$CONTAINER" sed -i \
-    -e "s/${OLD_BARE_BLUE}/${NEW_BARE}/g" \
-    -e "s/${OLD_BARE_PINK}/${NEW_BARE}/g" \
-    "$THEME_FILE"
+# Build one sed expression per old->new pair from the map above.
+SED_ARGS=()
+for pair in "${BARE_MAP[@]}"; do
+
+    # Split "old new" into its two hex values.
+    old_hex="${pair%% *}"
+    new_hex="${pair##* }"
+    SED_ARGS+=(-e "s/${old_hex}/${new_hex}/g")
+done
+
+docker exec "$CONTAINER" sed -i "${SED_ARGS[@]}" "$THEME_FILE"
 
 # ── Restart to load new CSS ──────────────────────────────────────────────────
 docker restart "$CONTAINER"
