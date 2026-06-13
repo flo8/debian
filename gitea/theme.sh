@@ -40,7 +40,7 @@ declare -a BARE_MAP=(
 
 # ── Root check ───────────────────────────────────────────────────────────────
 if [ "$EUID" -ne 0 ]; then
-    echo "Run as root:  sudo bash gitea_theme.sh"
+    echo "Run as root:  sudo bash gitea/theme.sh"
     exit 1
 fi
 

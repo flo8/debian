@@ -11,7 +11,7 @@ ADMIN_PASS="changeit"
 
 # ── Root check ──────────────────────────────────────────────────────────────
 if [ "$EUID" -ne 0 ]; then
-    echo "Run as root:  sudo bash install-gitea.sh"
+    echo "Run as root:  sudo bash gitea/install.sh"
     exit 1
 fi
 

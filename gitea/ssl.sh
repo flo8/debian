@@ -7,7 +7,7 @@ AWS_CREDS_FILE="/root/.aws/credentials"
 
 # ── Root check ───────────────────────────────────────────────────────────────
 if [ "$EUID" -ne 0 ]; then
-    echo "Run as root:  sudo bash install-certbot.sh"
+    echo "Run as root:  sudo bash gitea/ssl.sh"
     exit 1
 fi
 
