@@ -17,7 +17,7 @@ set -euo pipefail
 # ============================================================================
 
 # ========= CONFIG =========
-VERSION="1.1.15"
+VERSION="1.1.16"
 USERNAME="flo"
 AIR360_USER="air360"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
@@ -185,10 +185,21 @@ if ! id "$AIR360_USER" &>/dev/null; then
   useradd --system --no-create-home --home-dir /usr/local/air360 --shell /usr/sbin/nologin "$AIR360_USER"
 fi
 
+# The deploy Makefile (air360-live) rsyncs the binary in as $USERNAME
+# directly, then sudo-chowns it to $AIR360_USER afterward — that chown only
+# fixes ownership of the file rsync just wrote, it doesn't grant $USERNAME
+# write access to the directory itself. Group membership does that part.
+usermod -aG "$AIR360_USER" "$USERNAME"
+
 # ========= DIRECTORY =========
 log "Creating /usr/local/air360"
 
-install -d -m 755 -o "$AIR360_USER" -g "$AIR360_USER" /usr/local/air360
+# 2775: setgid so anything written here (by $USERNAME over rsync, or by
+# $AIR360_USER itself) lands in the air360 group automatically, group-write
+# so $USERNAME's rsync can create/replace files without needing to be
+# $AIR360_USER. Ownership (the user, not group) still gets fixed up by the
+# deploy Makefile's sudo chown after each push.
+install -d -m 2775 -o "$AIR360_USER" -g "$AIR360_USER" /usr/local/air360
 
 # Reassert ownership on everything already inside, in case this is a re-run
 # on a box where files were dropped in under a different owner.
