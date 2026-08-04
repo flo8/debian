@@ -64,13 +64,16 @@ export COLORTERM=truecolor
 # di  = directories (bold magenta)
 # ln  = symlinks (bold cyan)
 # ex  = executables (pink 256-color)
-# su/sg/ow/st/tw = setuid/setgid files, world-writable & sticky dirs.
-#   Without these, ls falls back to its compiled-in defaults (black-on-yellow
-#   for setgid, white-on-red for setuid, etc.) which clash with the rest of
-#   this palette — every other entry here is a bold foreground color with no
-#   background.
+# su/ow/st/tw = setuid files, world-writable & sticky dirs.
+#   Without these, ls falls back to its compiled-in defaults (white-on-red
+#   for setuid, etc.) which clash with the rest of this palette — every other
+#   entry here is a bold foreground color with no background.
+# sg=0 disables ls's special setgid indicator (default: black-on-yellow) so
+#   setgid files (e.g. group-shared app dirs) fall through to their normal
+#   exec/extension color instead of being flagged — setgid is a benign
+#   ownership convention here, not a security signal like setuid.
 # Plus per-extension highlights for common dev files.
-export LS_COLORS="di=1;35:ln=1;36:ex=38;5;213:su=1;31:sg=38;5;208:ow=1;31:st=1;34:tw=1;32:*.go=1;34:*.mod=1;33:*.sum=1;33:*.json=1;96:*.md=1;95:*.txt=1;37:*.sh=1;93:*.yaml=1;94:*.yml=1;94:*.bin=38;5;213:*.out=38;5;213:*.log=1;90"
+export LS_COLORS="di=1;35:ln=1;36:ex=38;5;213:su=1;31:sg=0:ow=1;31:st=1;34:tw=1;32:*.go=1;34:*.mod=1;33:*.sum=1;33:*.json=1;96:*.md=1;95:*.txt=1;37:*.sh=1;93:*.yaml=1;94:*.yml=1;94:*.bin=38;5;213:*.out=38;5;213:*.log=1;90"
 
 alias ls='ls -lah --group-directories-first --color=auto'
 alias grep='grep --color=auto'
