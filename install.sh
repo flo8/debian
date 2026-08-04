@@ -17,8 +17,9 @@ set -euo pipefail
 # ============================================================================
 
 # ========= CONFIG =========
-VERSION="1.1.14"
+VERSION="1.1.15"
 USERNAME="flo"
+AIR360_USER="air360"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
 REPO_RAW="https://raw.githubusercontent.com/flo8/debian/main"
 
@@ -174,9 +175,24 @@ echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/90-$USERNAME"
 chmod 440 "/etc/sudoers.d/90-$USERNAME"
 visudo -cf "/etc/sudoers.d/90-$USERNAME"
 
+# ========= AIR360 SERVICE USER =========
+log "Creating service user $AIR360_USER"
+
+# System account: no login shell, no home directory of its own. It exists
+# only to own /usr/local/air360, not to log in (it's also blocked from SSH
+# by the sshd AllowGroups sshusers restriction below).
+if ! id "$AIR360_USER" &>/dev/null; then
+  useradd --system --no-create-home --home-dir /usr/local/air360 --shell /usr/sbin/nologin "$AIR360_USER"
+fi
+
 # ========= DIRECTORY =========
 log "Creating /usr/local/air360"
-install -d -m 755 -o "$USERNAME" -g "$USERNAME" /usr/local/air360
+
+install -d -m 755 -o "$AIR360_USER" -g "$AIR360_USER" /usr/local/air360
+
+# Reassert ownership on everything already inside, in case this is a re-run
+# on a box where files were dropped in under a different owner.
+chown -R "$AIR360_USER:$AIR360_USER" /usr/local/air360
 
 # ========= UFW =========
 # Configure firewall BEFORE touching sshd so that, if the sshd restart goes

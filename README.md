@@ -16,7 +16,7 @@ installs the dotfiles below, and applies the base configuration. Set
 
 | Path | What it is |
 |------|------------|
-| `install.sh` | Main provisioning script (run on a fresh server). |
+| `install.sh` | Main provisioning script (run on a fresh server). Also creates the `air360` service user, which owns `/usr/local/air360`. |
 | `add-sshuser.sh` | Adds an extra SSH user. |
 | `neon-break.sh` | Standalone helper script. |
 | `motd` | Login message-of-the-day. |
