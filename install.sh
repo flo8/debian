@@ -17,7 +17,7 @@ set -euo pipefail
 # ============================================================================
 
 # ========= CONFIG =========
-VERSION="1.1.16"
+VERSION="1.1.17"
 USERNAME="flo"
 AIR360_USER="air360"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
@@ -66,7 +66,7 @@ apt-get install -y \
   `# Version control & transfer` \
   git lazygit curl wget \
   `# System observability` \
-  htop btop lsof strace sysstat ncdu duf dstat linux-cpupower linux-perf valgrind \
+  htop btop lsof strace sysstat ncdu duf linux-cpupower linux-perf valgrind \
   `# Compilers / dev tools` \
   build-essential clang clang-format clangd gdb pkg-config cmake \
   `# Network troubleshooting` \
@@ -74,6 +74,14 @@ apt-get install -y \
   iperf3 ipcalc arping iftop \
   `# Security / remote access` \
   ufw openssh-server
+
+# No dstat above: on Debian 13 "dstat" is provided by pcp, which runs pmcd,
+# pmlogger and a check every 30 minutes that spikes the CPU.
+#
+# cron recommends a mail agent, so apt pulls in the exim4 daemon. Nothing here
+# reads local mail, so remove it; cron itself stays.
+log "Removing the exim4 mail daemon"
+apt-get purge -y exim4-base exim4-config exim4-daemon-light bsd-mailx
 
 # ========= BAT SYMLINK =========
 log "Creating bat symlink for fzf"
