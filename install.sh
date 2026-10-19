@@ -17,7 +17,7 @@ set -euo pipefail
 # ============================================================================
 
 # ========= CONFIG =========
-VERSION="1.1.17"
+VERSION="1.1.18"
 USERNAME="flo"
 AIR360_USER="air360"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
@@ -60,7 +60,7 @@ apt-get dist-upgrade -y
 log "Installing base packages"
 apt-get install -y \
   `# Core shell / system` \
-  sudo vim micro hx tmux bash-completion cron rsyslog systemd-timesyncd \
+  sudo vim micro hx tmux bash-completion cron systemd-timesyncd \
   `# File / archive utilities` \
   rsync tree mc fzf bat unzip s3cmd jq sqlite3 \
   `# Version control & transfer` \
@@ -77,6 +77,9 @@ apt-get install -y \
 
 # No dstat above: on Debian 13 "dstat" is provided by pcp, which runs pmcd,
 # pmlogger and a check every 30 minutes that spikes the CPU.
+#
+# No rsyslog either: the journal is persistent on Debian 13, rsyslog would only
+# copy it to text files. Use journalctl instead of /var/log/syslog.
 #
 # cron recommends a mail agent, so apt pulls in the exim4 daemon. Nothing here
 # reads local mail, so remove it; cron itself stays.
