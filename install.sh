@@ -17,7 +17,7 @@ set -euo pipefail
 # ============================================================================
 
 # ========= CONFIG =========
-VERSION="1.1.18"
+VERSION="1.1.19"
 USERNAME="flo"
 AIR360_USER="air360"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
@@ -85,6 +85,14 @@ apt-get install -y \
 # reads local mail, so remove it; cron itself stays.
 log "Removing the exim4 mail daemon"
 apt-get purge -y exim4-base exim4-config exim4-daemon-light bsd-mailx
+
+# man-db rebuilds its index daily (the timer) and after every apt run (the
+# auto-update file). Both spike the CPU; man works without it, only apropos
+# gets stale.
+log "Disabling man-db index rebuilds"
+systemctl mask --now man-db.timer
+echo "man-db man-db/auto-update boolean false" | debconf-set-selections
+rm -f /var/lib/man-db/auto-update
 
 # ========= BAT SYMLINK =========
 log "Creating bat symlink for fzf"
