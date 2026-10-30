@@ -17,7 +17,7 @@ set -euo pipefail
 # ============================================================================
 
 # ========= CONFIG =========
-VERSION="1.1.20"
+VERSION="1.1.21"
 USERNAME="flo"
 AIR360_USER="air360"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
@@ -131,6 +131,17 @@ APT
 
 # Older collector boxes had the security-only part in a file of their own
 rm -f /etc/apt/apt.conf.d/51unattended-upgrades-security
+
+# ========= MPTCP =========
+# Multipath TCP has had several kernel CVEs in 2026. Go 1.24+ listens with
+# MPTCP by default, so our Go services accept it unless the kernel says no.
+# With it off, Go falls back to plain TCP on its own.
+#
+# MPTCP is built into Debian's kernel, not a module, so blacklisting does
+# nothing: the sysctl is the only switch.
+log "Disabling MPTCP"
+echo "net.mptcp.enabled = 0" > /etc/sysctl.d/90-no-mptcp.conf
+sysctl -p /etc/sysctl.d/90-no-mptcp.conf
 
 # ========= BAT SYMLINK =========
 log "Creating bat symlink for fzf"
