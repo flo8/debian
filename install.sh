@@ -143,6 +143,15 @@ log "Disabling MPTCP"
 echo "net.mptcp.enabled = 0" > /etc/sysctl.d/90-no-mptcp.conf
 sysctl -p /etc/sysctl.d/90-no-mptcp.conf
 
+# ========= LLMNR =========
+# systemd-resolved answers LLMNR name lookups on port 5355, on every
+# interface. That is for finding machines on a home LAN by name; a server
+# never needs it. ufw already blocks the port, this stops the listener too.
+log "Disabling LLMNR in systemd-resolved"
+mkdir -p /etc/systemd/resolved.conf.d
+printf '[Resolve]\nLLMNR=no\n' > /etc/systemd/resolved.conf.d/90-no-llmnr.conf
+systemctl restart systemd-resolved
+
 # ========= BAT SYMLINK =========
 log "Creating bat symlink for fzf"
 ln -sf /usr/bin/batcat /usr/local/bin/bat
