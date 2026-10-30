@@ -17,7 +17,7 @@ set -euo pipefail
 # ============================================================================
 
 # ========= CONFIG =========
-VERSION="1.1.19"
+VERSION="1.1.20"
 USERNAME="flo"
 AIR360_USER="air360"
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEjGiJLi9DlEA8h0GKTz9WtvD6P2XE9C/KHn5nKtKC2Y flo@lothlorien"
@@ -26,6 +26,11 @@ REPO_RAW="https://raw.githubusercontent.com/flo8/debian/main"
 # Optional hostname override. Set via env: NEW_HOSTNAME=foo curl ... | sudo -E bash
 # When empty, the script leaves the system hostname unchanged.
 NEW_HOSTNAME="${NEW_HOSTNAME:-}"
+
+# Time (UTC, HH:MM) to reboot after a security update that needs one, such as
+# a new kernel. Boxes behind the same DNS name need different times so they
+# never reboot together. Set via env like NEW_HOSTNAME.
+REBOOT_TIME="${REBOOT_TIME:-02:00}"
 
 # ========= HELPERS =========
 log() {
@@ -93,6 +98,39 @@ log "Disabling man-db index rebuilds"
 systemctl mask --now man-db.timer
 echo "man-db man-db/auto-update boolean false" | debconf-set-selections
 rm -f /var/lib/man-db/auto-update
+
+# ========= SECURITY UPDATES =========
+# unattended-upgrades runs once a day, between 06:00 and 07:00 UTC
+# (apt-daily-upgrade.timer). Security fixes only: Debian's default also
+# installs point releases, which are not urgent and are upgraded by hand.
+#
+# A new kernel does nothing until the box reboots, so reboot at REBOOT_TIME
+# when an update asks for it (/var/run/reboot-required). Without this, a
+# fixed kernel can sit on disk for weeks while the old one runs.
+#
+# Our own file, read after 50unattended-upgrades, so the package's file stays
+# untouched. ${distro_codename} is for apt to expand, not the shell.
+log "Enabling daily security updates, reboot at $REBOOT_TIME UTC when needed"
+[[ "$REBOOT_TIME" =~ ^[0-2][0-9]:[0-5][0-9]$ ]] || die "REBOOT_TIME must be HH:MM, got: $REBOOT_TIME"
+apt-get install -y unattended-upgrades
+
+cat > /etc/apt/apt.conf.d/20auto-upgrades <<'APT'
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+APT
+
+cat > /etc/apt/apt.conf.d/51unattended-upgrades-air360 <<APT
+#clear Unattended-Upgrade::Origins-Pattern;
+Unattended-Upgrade::Origins-Pattern {
+        "origin=Debian,codename=\${distro_codename}-security,label=Debian-Security";
+};
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+Unattended-Upgrade::Automatic-Reboot-Time "$REBOOT_TIME";
+APT
+
+# Older collector boxes had the security-only part in a file of their own
+rm -f /etc/apt/apt.conf.d/51unattended-upgrades-security
 
 # ========= BAT SYMLINK =========
 log "Creating bat symlink for fzf"
